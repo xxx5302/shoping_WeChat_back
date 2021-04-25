@@ -1,0 +1,131 @@
+<div class="modal-dialog">
+    <div style='max-height:500px;overflow:auto;min-width:400px;background-color:#fff;'>
+        <table class="table supplyquery table-hover" style="min-width:400px;">
+            <div class="input-group layui-row" style="margin:10px;">
+                <input type="text" placeholder="请输入昵称进行搜索" id="select-url-kw" value="" class="form-control">
+                <span class="input-group-addon btn btn-default select-btn" data-type="url" id="sarchBtn">搜索</span>
+            </div>
+            <tbody>
+                <?php foreach( $ds as  $row  ){ ?>
+                <tr>
+                    <td> {$row['username']}</td>
+
+                    <td>{$row['mobile']}</td>
+                    <td style="width:80px;"><a href="javascript:;" class="choose_dan_link" data-json='{:json_encode($row);}'>选择</a></td>
+                </tr>
+                <?php } ?>
+                <?php if( count($ds)<=0){ ?>
+                <tr>
+                    <td colspan='4' align='center'>未找到配送员</td>
+                </tr>
+                <?php } ?>
+            </tbody>
+            <?php if( count($ds) > 0){ ?>
+            <tfoot>
+                <tr>
+                    <td colspan='4' align='center' id="pager_ajax">{$pager}</td>
+                </tr>
+            </tfoot>
+            <?php } ?>
+        </table>
+    </div>
+</div>
+<script>
+var query_kwd = '{$kwd}';
+var query_url = "{:U('orderdistribution/choosemember')}";
+var can_next = true;
+
+var order_id = "{$id}";
+
+
+$(document).delegate(".choose_dan_link","click",function(){
+    var loadingIndex = layer.load(); // 加载中动画遮罩层（1）
+	//data-json
+	var json_obj = JSON.parse($(this).attr('data-json'));
+	var id = json_obj.id;
+
+    console.log(order_id);
+    console.log(id);
+
+    $.ajax({
+        url:"{:U('Orderdistribution/sub_orderchoose_distribution')}",
+        type:'post',
+        dataType:'json',
+        data:{order_id:order_id, id:id},
+        success:function(info)
+        {
+
+
+            if(info.status == 0)
+            {
+
+                layer.msg(info.result.message,{icon: 1,time: 2000});
+                layer.close(loadingIndex); // 提交成功失败都需要关闭
+            }else if(info.status == 1){
+                var go_url = location.href;
+                if( info.result.hasOwnProperty("url") )
+                {
+                    go_url = info.result.url;
+                }
+
+                layer.msg('分配成功',{time: 1000,
+                    end:function(){
+                        var backurl = "{:U('Order/index',array('ok'=>'1'))}";
+                        location.href = backurl;
+                        // location.href = info.result.url;
+                    }
+                });
+            }
+        }
+    })
+
+    return false;
+   // layer.close(layer.index);
+});
+
+$("body").delegate(".pagination a","click",function(){
+	var s_page = $(this).attr('page');
+	if(!can_next)
+	{
+		return false;
+	}
+	can_next = false;
+	$.ajax({
+		url:query_url,
+		type:'post',
+		dataType:'json',
+		data:{keyword:query_kwd, page:s_page,is_ajax:1},
+		success:function(ret){
+			if(ret.code == 0)
+			{
+				$('.supplyquery tbody').html(ret.html);
+				$('#pager_ajax').html(ret.pager);
+				
+			}
+			can_next = true;
+		}
+	})
+})
+
+$("body").delegate("#sarchBtn","click",function(){
+	var keyword = $('#select-url-kw').val();
+	$.ajax({
+		url:query_url,
+		type:'post',
+		dataType:'json',
+		data:{keyword:keyword,page:1,is_ajax:1, id:<?php echo $id; ?>},
+		success:function(ret){
+			if(ret.code == 0)
+			{
+				$('.supplyquery tbody').html(ret.html);
+				$('#pager_ajax').html(ret.pager);
+				
+			}
+		}
+	})
+})
+
+
+
+
+</script>

@@ -1,0 +1,83 @@
+<div class="adv_list" id="adv_list_{$num}">
+    <input type="hidden" name="aid[]" value="{$num}"/>
+    <input type="hidden" name="adv_id[]" value=""/>
+    <div class="layui-form-item">
+        <label class="layui-form-label">广告<span class="adv_num">{$num}</span>图片</label>
+        <div class="layui-input-block">
+            {:tpl_form_field_image2('thumb[]', '')}
+            <span class='help-block'>建议尺寸:710 * 320或同比例, 请将所有幻灯片图片尺寸保持一致</span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">广告<span class="adv_linkurl">{$num}</span>跳转</label>
+        <div class="layui-input-block">
+            <label class='radio-inline'>
+                <input type='radio' name='data[linktype_{$num}]' lay-filter="linktype_{$num}"  title="本小程序链接" value="1" checked="checked"/>
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='data[linktype_{$num}]' lay-filter="linktype_{$num}" title="webview外链" value="0"/>
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='data[linktype_{$num}]' lay-filter="linktype_{$num}"  title="外部小程序链接" value="2"/>
+            </label>
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none;" id="typeGroup_{$num}">
+        <div class="layui-input-block " style="text-align: left;">
+            <label class="layui-form-label" style="text-align: left;">外链小程序appid</label>
+            <input type="text" id='appid' name="data[appid_{$num}]" class="form-control" value="" maxlength="32" style="width:70%;"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="text-align: left;">
+            <label class="layui-form-label" style="text-align: left;">链接</label>
+            <div class="input-group " style="margin: 0;width:50%;">
+                <input type="text" value="" class="form-control valid" name="data[link_{$num}]" placeholder="" id="advlink_{$num}">
+                <span class="input-group-btn" id="chose_link_box_{$num}">
+                <span data-input="#advlink_{$num}" id="chose_link_{$num}"  class="btn btn-default">选择链接</span>
+                </span>
+            </div>
+            <span class='help-block' style="display:none;" id="chose_link_tip_{$num}">备注：请使用http或https链接，需要在<a href="http://mp.weixin.qq.com" target="_blank">mp.weixin.qq.com</a>开发-开发设置-业务域名添加上此域名</span>
+
+        </div>
+    </div>
+</div>
+
+<script>
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+var layer = layui.layer;
+var $;
+
+var cur_open_div;
+layui.use(['jquery', 'layer','form'], function() {
+    $ = layui.$;
+    var form = layui.form;
+    form.on('radio(linktype_{$num})', function (data) {
+        if (data.value == 2) {
+            $('#typeGroup_{$num}').show();
+            $('#chose_link_box_{$num}').hide();
+        }
+        else if (data.value == 0) {
+            $('#typeGroup_{$num}').hide();
+            $('#chose_link_box_{$num}').hide();
+            $('#chose_link_tip_{$num}').show();
+        }
+        else {
+            $('#typeGroup_{$num}').hide();
+            $('#chose_link_box_{$num}').show();
+            $('#chose_link_tip_{$num}').hide();
+        }
+    });
+
+    $('#chose_link_{$num}').click(function(){
+        cur_open_div = $(this).attr('data-input');
+        $.post("/seller.php?s=/util/selecturl/ok/1", {}, function(shtml){
+            layer.open({
+                type: 1,
+                area: '930px',
+                content: shtml //注意，如果str是object，那么需要字符拼接。
+            });
+        });
+    })
+});
+</script>

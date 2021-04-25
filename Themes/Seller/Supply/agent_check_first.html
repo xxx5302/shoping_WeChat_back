@@ -1,0 +1,74 @@
+<form class="form-horizontal form-validate" action="{:U('supply/agent_check_first')}" method="post" enctype="multipart/form-data">
+	<input type='hidden' name='id' value='{$id}' />
+
+		<div class="modal-dialog">
+           <div class="modal-content">
+            <div class="modal-header">
+                <button data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">供应商类型审核</h4>
+            </div>
+            <div class="modal-body">
+                <label>
+					<input type="radio" name="type" value="0"  <?php if($type == '0'){   ?> checked <?php } ?> />&nbsp;&nbsp;平台供应商
+				</label>&nbsp;&nbsp;&nbsp;&nbsp;
+				<label>
+					<input type="radio" name="type" value="1"  <?php if($type == '1'){   ?> checked <?php } ?>   &nbsp;/> 独立供应商
+				</label>
+				<div style="color:#b9b3b7">平台供应商：商品以平台名义发货，不可独立进行发货，需要平台配合发货，可独立操作商品，财务。</div>
+				<div style="color:#b9b3b7">独立供应商：商品以供应商名义发货，可独立操作商品，订单，财务以及其他设置。</div>
+				<div style="color:#b9b3b7">请根据需要的供应商类型进行选择，供应商类型审核只能选择一次，后续不可修改!</div>
+				
+			</div>
+            <div class="modal-footer">
+				
+				<input type="hidden" id="sb_type" name="cansub" value="1" />
+				
+                <button class="btn btn-primary" type="submit" data-value="1" name="cansub" id="submit2">确定</button>
+                <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+            </div>
+        </div>
+</form>
+<script>
+    //没有选中时间段不能导出
+    $(function () {
+        $('.btn-primary').click(function () {
+            var e = $(this).attr('data-value');
+			
+           $('#sb_type').val(e);
+		   
+        })
+
+      $("#submit2").click(function () {
+          var s_data = $('#ajaxModal form').serialize();
+
+          console.log(ajax_url2);
+          $.ajax({
+              url:ajax_url2,
+              type:'post',
+              dataType:'json',
+              data:s_data,
+              success:function(info){
+                  if(info.status == 0)
+                  {
+                      layer.msg(info.result.message,{icon: 1,time: 2000});
+                  }else if(info.status == 1){
+                      var go_url = location.href;
+                      if( info.result.hasOwnProperty("url") )
+                      {
+                          go_url = info.result.url;
+                      }
+
+                      layer.msg('操作成功',{time: 1000,
+                          end:function(){
+                              location.href = info.result.url;
+                          }
+                      });
+                  }
+              }
+          })
+          return false;
+      })
+
+    })
+</script>
+

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+ 
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->  
+
+<link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+<link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+<script type="text/javascript">
+  window.sysinfo = {
+  <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+  
+  <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+  
+  <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+  
+  <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+  
+  'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+  
+  'siteroot': '{$_W['siteroot']}',
+    'siteurl': '{$_W['siteurl']}',
+    'attachurl': '{$_W['attachurl']}',
+    'attachurl_local': '{$_W['attachurl_local']}',
+    'attachurl_remote': '{$_W['attachurl_remote']}',
+    'module' : {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+    'cookie' : {'pre': ''},
+    'account' : {:json_encode($_W['account'])},
+  };
+</script>
+
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/lib/jquery.nice-select.js?v=201903260001"></script>
+<link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+<link href="/static/css/snailfish.css" rel="stylesheet">
+  <style>
+    .layui-table[lay-size=lg] td, .layui-table[lay-size=lg] th {
+      padding: 15px 10px;
+    }
+    .product-info{padding-left: 80px;padding-top: 20px;}
+    .tDiv img{float:left;}
+	.hxBtn{color:#428bca;}
+  </style>
+</head>
+<body layadmin-themealias="default">
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text">({$smember_info['username']})核销记录</span></div>
+    <div class="layui-card-body" style="padding:15px;">
+      <form action="" method="get" class="form-horizontal form-search layui-form" role="form">
+        <input type="hidden" name="c" value="salesroom_order" />
+        <input type="hidden" name="a" value="member_orders" />
+        <input type="hidden" name="smember_id" value="{$smember_info['id']}" />
+        <div class="layui-form-item">
+          <div class="layui-inline">
+          <div class="layui-input-inline" style="width: 300px;">
+            <input type="text" class="layui-input" name='keyword' value="{$keyword}" placeholder="请输入订单号/商品名称/收货人/手机号">
+          </div>
+          <div class="layui-input-inline" >
+			<select name='payment_code' class='layui-input layui-unselect' style="width:80px;"  >
+				<option value=''>支付方式</option>
+				<option value='weixin' <?php if( $payment_code=='weixin' ){ ?>selected<?php } ?>>微信支付</option>
+				<option value='yuer' <?php if( $payment_code=='yuer' ){ ?>selected<?php } ?>>余额支付</option>
+				<option value='admin' <?php if( $payment_code=='admin' ){ ?>selected<?php } ?>>后台付款</option>
+			</select>
+		</div>
+          <div class="layui-input-inline">
+			<select name='searchtime' class='form-control' style="width:100px;padding:0 5px;"  id="searchtime">
+				<option value=''>不按时间</option>
+				<option value='create_time' <?php if( $searchtime =='create_time' ){ ?>selected<?php } ?>>下单时间</option>
+			</select>
+		 </div>
+		 <div class="layui-input-inline" style="width: 285px;">
+				{:tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d H:i', $starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+		 </div>
+          <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-sm"  type="submit"> 搜索</button>
+          </div>
+          </div>
+        </div>
+        
+      </form>
+      <form action="" class="layui-form" lay-filter="example" method="post" >
+        <div class="row">
+          <div class="col-md-12">
+            <table class="layui-table" lay-skin="line" lay-size="lg">
+              <thead>
+                <tr>
+                  <th style="width:20%">商品</th>
+                  <th style="width:10%;">收货姓名/电话</th>
+                  <th style="width:10%;">配送/支付</th>
+                  <th style="width:10%;">到店核销方式</th>
+                  <th style="width:10%;">核销时间</th>
+                  <th style="width:10%;">核销门店</th>
+                  <th style="width:10%;">核销人员</th>
+                  <th style="width:10%;">订单状态</th>
+                  <th style="width: 250px;">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+              <?php if(!empty($list)){ ?>
+              <?php foreach( $list as  $item  ){ ?>
+              	<tr class="tr-order-sn">
+					<td colspan="8">
+						<div class="tDiv ml10">						
+                            <span class="words">订单号： {$item['order_num_alias']}</span>
+                            <span class="words">下单时间：{$item['date_added']}</span>
+						</div>
+					</td>
+				</tr>
+                <tr>
+                  <td>
+                    <div class="tDiv relative tpinfo last ">
+		            	<div class="img">
+		            		<img width="70" src="<?php echo tomedia($item['goods_images']);?>" alt="">
+		            	</div>
+		                <div class="product-info">
+		                	<div class="name mb5">{$item['goods_name']}</div>
+		                </div>
+					</div>
+                  </td>
+                  <td>
+                    	姓名：{$item['shipping_name']}<br/>
+                    	电话：{$item['telephone']}<br/>
+                  </td>
+                  <td>
+                    <?php if( $item['payment_code']=='yuer'){ ?>
+					   <span> <i class="text-warning" style="font-size: 17px;"></i><span>余额支付</span></span>
+					<?php }else if( $item['payment_code']=='admin' ){ ?>
+					   <span> <i class=" text-danger" style="font-size: 17px"></i>后台付款</span>
+					<?php  }else{  ?>
+					   <span class="line-text"> 微信支付</span>
+					<?php } ?>
+                  </td>
+                  <td>
+                    <div class="tDiv" style="text-align: left;">
+						<div style='margin-top:5px;display:block;'>
+							<?php if($item['hexiao_type'] == 0){ ?>	
+								订单核销
+							<?php }else{ ?>
+								按次核销
+							<?php } ?>
+						</div>
+						<div style='margin-top:5px;display:block;'>
+							<?php if($item['is_hexiao_over'] == 1){ ?>
+								<a class="hxBtn"  href="javascript:;" data-href="{:U('order/view_hexiao_history', array('id' => $item['order_id'],'order_goods_id'=>$item['order_goods_id']))}">(核销记录)</a>
+							<?php }else if($item['is_hexiao_over'] == 0 && $item['hexiao_count'] > $item['remain_hexiao_count']){ ?>
+								<a class="hxBtn"  href="javascript:;" data-href="{:U('order/view_hexiao_history', array('id' => $item['order_id'],'order_goods_id'=>$item['order_goods_id']))}">(部分使用)</a>
+							<?php } ?>
+						</div>
+					</div>
+                  </td>
+                  <td>
+                  	<?php echo date('Y-m-d H:i:s',$item['hexiao_time']);?>
+                  </td>
+                  <td>
+                  	{$item['salesroom_name']}
+                  </td>
+                  <td>
+                  	{$item['smember_name']}
+                  </td>
+                  <td>
+                  	<?php if($item['is_hexiao_over'] == 1){ ?>
+                  		<span style="color:#428bca;">已完成</span><br/>
+                  	<?php }else{ ?>
+                  		<span style="color:#428bca;">待核销</span>
+                  	<?php } ?>
+                  </td>
+                  <td style="overflow:visible;position:relative">
+                    <a class='layui-btn layui-btn-xs' href="{:U('order/detail', array('id'=>$item['order_id']))}" >
+                     	 查看详情
+                    </a>
+                  </td>
+                </tr>
+              <?php }}else{ ?>
+              <tr>
+                <td colspan="9" style="text-align: center;color:red;">
+                  	暂无记录！
+                </td>
+              </tr>
+              <?php } ?>
+              </tbody>
+              <tfoot>
+              <tr>
+                <td colspan="9" style="text-align: right">
+                  {$pager}
+                </td>
+              </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="/layuiadmin/layui/layui.js"></script>
+
+<script>
+  layui.config({
+    base: '/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use('index');
+</script>
+
+<script>
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+var layer = layui.layer;
+var $;
+
+layui.use(['jquery', 'layer','form'], function(){ 
+  $ = layui.$;
+  var form = layui.form;
+  
+  $('.hxBtn').click(function(){
+		var url = $(this).attr('data-href');
+		$.post(url, {}, function(shtml){
+		 layer.open({
+			type: 1,
+			area: '930px',
+			content: shtml //注意，如果str是object，那么需要字符拼接。
+		  });
+		});
+	   return false;
+	})
+  
+
+})
+
+</script>  
+</body>
+</html>
+
+

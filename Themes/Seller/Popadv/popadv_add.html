@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+ 
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->  
+
+<link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+<link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+<script type="text/javascript">
+            window.sysinfo = {
+            <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+			
+            <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+			
+            <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+			
+            <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+			
+            'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+			
+            'siteroot': '{$_W['siteroot']}',
+                    'siteurl': '{$_W['siteurl']}',
+                    'attachurl': '{$_W['attachurl']}',
+                    'attachurl_local': '{$_W['attachurl_local']}',
+                    'attachurl_remote': '{$_W['attachurl_remote']}',
+                    'module' : {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+            'cookie' : {'pre': ''},
+            'account' : {:json_encode($_W['account'])},
+            };
+        </script>
+		
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+<link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+<link href="/static/css/snailfish.css" rel="stylesheet">
+<style>
+    .content{
+        display:none;
+        width:200px;
+        height:200px;
+        border-radius:10px;
+        padding:20px;
+        position:relative;
+        top:15px;
+        left:50%;
+        background-color:FFFFFF;
+        border:1px solid;
+    }
+</style>
+</head>
+<body layadmin-themealias="default">
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text">添加弹窗广告</span></div>
+		<div class="layui-card-body" style="padding:15px;">
+			<form action="" method="post" class="layui-form" lay-filter="component-layui-form-item">
+                <div class="layui-form-item">
+                    <label class="layui-form-label mustl"></label>
+                    <div class="layui-input-block">
+                        <span class='help-block'>使用弹窗广告请<span style="color:red;">开启redis服务</span>，否则无法使用</span>
+                    </div>
+                </div>
+				<div class="layui-form-item">
+                    <label class="layui-form-label mustl">活动名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="data[adv_name]" class="form-control" value=""  lay-verify='true' style="width: 50%;display: inline-block;" placeholder="请输入20个字以内名称" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">全部广告</label>
+                    <div class="layui-input-block"  style="width: 100%;">
+                        <a href="javascript:void(0)" id="addAdv" style="display:inline-block;color: #428bca;margin-top: 5px;">添加广告</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="javascript:void(0)" id="delAdv" style="display:inline-block;color: #428bca;margin-top: 5px;">删除广告</a>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #98999a;">(删除广告从最后一个开始删除，第一个广告无法删除)</span>
+                    </div>
+                </div>
+
+                <div class="adv_list" id="adv_list_1">
+                    <input type="hidden" name="aid[]" value="1"/>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">广告<span class="adv_num">1</span>图片</label>
+                        <div class="layui-input-block">
+                            {:tpl_form_field_image2('thumb[]', '')}
+                            <span class='help-block'>建议尺寸:710 * 320或同比例, 请将所有幻灯片图片尺寸保持一致</span>
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">广告<span class="adv_linkurl">1</span>跳转</label>
+                        <div class="layui-input-block">
+                            <label class='radio-inline'>
+                                <input type='radio' name='data[linktype_1]' lay-filter="linktype_1"  title="本小程序链接" value="1" checked="checked"/>
+                            </label>
+                            <label class='radio-inline'>
+                                <input type='radio' name='data[linktype_1]' lay-filter="linktype_1" title="webview外链" value="0"/>
+                            </label>
+                            <label class='radio-inline'>
+                                <input type='radio' name='data[linktype_1]' lay-filter="linktype_1"  title="外部小程序链接" value="2"/>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item" style="display: none;" id="typeGroup_1">
+                        <div class="layui-input-block " style="text-align: left;">
+                            <label class="layui-form-label" style="text-align: left;">外链小程序appid</label>
+                            <input type="text" id='appid' name="data[appid_1]" class="form-control" value="" maxlength="32" style="width:70%;"/>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block" style="text-align: left;">
+                            <label class="layui-form-label" style="text-align: left;">链接</label>
+                            <div class="input-group " style="margin: 0;width:50%;">
+                                <input type="text" value="" class="form-control valid" name="data[link_1]" placeholder="" id="advlink_1">
+                                <span class="input-group-btn" id="chose_link_box_1">
+                                <span data-input="#advlink_1" id="chose_link_1"  class="btn btn-default">选择链接</span>
+                                </span>
+                            </div>
+                            <span class='help-block' style="display:none;" id="chose_link_tip_1">备注：请使用http或https链接，需要在<a href="http://mp.weixin.qq.com" target="_blank">mp.weixin.qq.com</a>开发-开发设置-业务域名添加上此域名</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="adv_end_list"></div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label mustl">广告时间</label>
+                    <div class="layui-input-block">
+                        {:tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d H:i', $item['begin_time']),'endtime'=>date('Y-m-d H:i', $item['end_time'])),true);}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">投放会员</label>
+                    <div class="layui-input-block" >
+                        <input type="radio" lay-filter="is_limit_goodsbuy" name="data[send_person]" value="1" checked title="指定用户发送" />
+                        <input type="radio" lay-filter="is_limit_goodsbuy" name="data[send_person]" value="2" title="按用户分组等级发送" />
+                        <input type="radio" lay-filter="is_limit_goodsbuy" name="data[send_person]" value="3" title="全部发送({$membercount}人)" />
+                    </div>
+                </div>
+                <div class="layui-form-item" id="type_1">
+                    <label class="layui-form-label">关联会员</label>
+                    <div class="layui-input-block">
+                        <div class="input-group " style="margin: 0;">
+                            <input type="text" disabled value="" class="form-control valid" name="" placeholder="" id="agent_id">
+							<span class="input-group-btn">
+								<span data-input="#agent_id" id="chose_agent_id"  class="btn btn-default">选择会员</span>
+							</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item" id="type_2" style="display:none;">
+                    <label class="layui-form-label must">会员组</label>
+                    <div class="layui-input-block">
+                        <select name="data[member_group_id]">
+                            <?php foreach($list as $val){ ?>
+                            <option value="{$val['id']}">{$val['groupname']}({$val['membercount']}人)</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label mustl">投放页面</label>
+                    <div class="layui-input-block" id="param-items">
+                        <label class="radio-inline">
+                            <input type="radio" name='data[pop_page]' lay-filter="pop_page" value="0" checked title="商城首页" />
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name='data[pop_page]' lay-filter="pop_page" value="1" title="商城分类" />
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name='data[pop_page]' lay-filter="pop_page" value="2" title="商城购物车" />
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name='data[pop_page]' lay-filter="pop_page" value="3" title="商城个人中心" />
+                        </label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label mustl">出现次数</label>
+                    <div class="layui-input-block" id="param-items">
+                        <div class="input-group">
+                            <input type="radio" name='data[is_index_show]' value="0" checked title='<font id="index_show_txt_1">首页</font><font>访问页面时出现，之后不再出现</font>'/>
+                        </div>
+                        <div class="input-group">
+                            <input type="radio" name='data[is_index_show]' value="1" title='<font id="index_show_txt">首页</font><font>访问页面时出现，之后每</font>&nbsp;&nbsp;<input type="text" value="" class="" name="data[show_hour]" style="width: 100px;" maxlength="10">&nbsp;&nbsp;<font>小时出现1次</font>' />
+                        </div>
+                        <span class='help-block'>出现频次时间间隔不能大于投放时间，在广告投放时间内，用户访问投放页面会弹出广告，请设置广告出现的频次</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="data[sort_order]" class="form-control" value=""/>
+                        <span class='help-block'>数字越大，排名越靠前</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <label class='radio-inline'>
+                            <input type='radio' name='data[status]' title="开启" value="1" />
+                        </label>
+                        <label class='radio-inline'>
+                            <input type='radio' name='data[status]' title="关闭" value="0" checked />
+                        </label>
+                    </div>
+                </div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"> </label>
+					<div class="layui-input-block">
+						<input type="submit" value="提交" lay-submit lay-filter="formDemo" class="btn btn-primary"  />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="btn btn-default" style='margin-left:10px;' href="{:U('popadv/index',array('ok'=>'1'))}">返回列表</a>
+						
+					</div>
+				</div>
+			</form>
+		</div>
+</div>
+</div>
+
+<script src="/layuiadmin/layui/layui.js"></script>
+
+<script>
+	layui.config({
+		base: '/layuiadmin/' //静态资源所在路径
+	}).extend({
+		index: 'lib/index' //主入口模块
+	}).use('index');
+</script>
+<script>
+$(document).ready(function(){
+    $(".contact").mouseover(function(){
+        $(".content").show("slow");
+        $(".contact").mouseout(function(){
+            $(".content").hide("slow");
+        });
+    });
+
+})
+
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+var layer = layui.layer;
+var $;
+
+var cur_open_div;
+
+layui.use(['jquery', 'layer','form'], function(){ 
+    $ = layui.$;
+    var form = layui.form;
+
+    form.on('radio(pop_page)', function(data){
+        if (data.value == 1) {
+            $('#index_show_txt').html('商城分类');
+            $('#index_show_txt_1').html('商城分类');
+        } else if (data.value == 2) {
+            $('#index_show_txt').html('商城购物车');
+            $('#index_show_txt_1').html('商城购物车');
+        } else if (data.value == 3) {
+            $('#index_show_txt').html('商城个人中心');
+            $('#index_show_txt_1').html('商城个人中心');
+        } else{
+            $('#index_show_txt').html('首页');
+            $('#index_show_txt_1').html('首页');
+        }
+    });
+
+    form.on('radio(linktype_1)', function(data){
+        if (data.value == 2) {
+            $('#typeGroup_1').show();
+            $('#chose_link_box_1').hide();
+        }
+        else if( data.value == 0 )
+        {
+            $('#typeGroup_1').hide();
+            $('#chose_link_box_1').hide();
+            $('#chose_link_tip_1').show();
+        }
+        else {
+            $('#typeGroup_1').hide();
+            $('#chose_link_box_1').show();
+            $('#chose_link_tip_1').hide();
+        }
+    });
+
+    form.on('radio(is_limit_goodsbuy)', function(data){
+
+        if(data.value == 1)
+        {
+            $('#type_1').show();
+            $('#type_2').hide();
+        }else if(data.value == 2)
+        {
+            $('#type_1').hide();
+            $('#type_2').show();
+        }
+        else{
+            $('#type_1').hide();
+            $('#type_2').hide();
+        }
+    });
+
+    $('#chose_link_1').click(function(){
+        cur_open_div = $(this).attr('data-input');
+        $.post("/seller.php?s=/util/selecturl/ok/1", {}, function(shtml){
+            layer.open({
+                type: 1,
+                area: '930px',
+                content: shtml //注意，如果str是object，那么需要字符拼接。
+            });
+        });
+    })
+
+    $('#chose_agent_id').click(function(){
+        cur_open_div = $(this).attr('data-input');
+        $.post("/seller.php?s=/user/zhenquery_many/template/mult", {}, function(shtml){
+            layer.open({
+                type: 1,
+                area: '930px',
+                content: shtml //注意，如果str是object，那么需要字符拼接。
+            });
+        });
+    })
+
+    $('#chose_member_id').click(function(){
+        cur_open_div = $(this).attr('data-input');
+        $.post("/seller.php?s=/user/query/is_quan/1", {}, function(shtml){
+            layer.open({
+                type: 1,
+                area: '930px',
+                content: shtml //注意，如果str是object，那么需要字符拼接。
+            });
+        });
+    })
+
+    $('#addAdv').click(function(){
+        var count = $('.adv_list').length;
+        if(count < 5){
+            $.ajax({
+                url: "/seller.php?s=/popadv/add_adv",
+                type: "post",
+                data: {num:count+1},
+                dataType:'json',
+                success: function (info) {
+                    $('#adv_end_list').before(info.html);
+                    layui.form.render();
+                }
+            });
+        }else{
+            layer.msg('广告最多添加5条',{icon:5});
+        }
+    })
+
+    $('#delAdv').click(function(){
+        var count = $('.adv_list').length;
+        if(count > 1){
+            $('.adv_list')[count-1].remove();
+        }else{
+            layer.msg('广告不能少于1条',{icon:5});
+        }
+    });
+
+    //监听提交
+    form.on('submit(formDemo)', function(data){
+    var loadingIndex = layer.load();
+
+    var member_id_ar = [];
+    var member_id_str = '';
+    $('.mult_choose_member_id').each(function(){
+        member_id_ar.push( $(this).attr('data-member-id') );
+    });
+    member_id_str = member_id_ar.join(',');
+
+    data.field.member_id = member_id_str;
+
+    console.log(data.field);
+     $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        data: data.field,
+        dataType:'json',
+        success: function (info) {
+
+            if(info.status == 0)
+            {
+                layer.msg(info.result.message,{icon: 1,time: 2000});
+                layer.close(loadingIndex);
+            }else if(info.status == 1){
+                var go_url = location.href;
+                if( info.result.hasOwnProperty("url") )
+                {
+                    go_url = info.result.url;
+                }
+
+                layer.msg('操作成功',{time: 1000,
+                    end:function(){
+                        location.href = info.result.url;
+                    }
+                });
+            }
+        }
+    });
+
+    return false;
+    });
+})
+
+function cancle_bind(obj,sdiv)
+{
+    $('#'+sdiv).val('');
+    $(obj).parent().parent().remove();
+}
+</script>  
+</body>

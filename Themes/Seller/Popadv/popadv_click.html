@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>index</title>
+</head>
+<body style="width:100%;margin:0 auto;text-align: center;">
+<table class="layui-table" style="width:98%;">
+    <thead>
+    <tr>
+        <th>广告名称</th>
+        <th>查看次数</th>
+        <th>打开次数</th>
+        <th>打开率</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>{$item['adv_name']}</td>
+        <td>{$item['view_num']}</td>
+        <td>{$item['open_num']}</td>
+        <td>
+            <?php echo round($item['open_num']/$item['view_num']*100,2)?>%
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

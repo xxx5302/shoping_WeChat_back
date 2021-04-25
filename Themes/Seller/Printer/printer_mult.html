@@ -1,0 +1,84 @@
+<div style='max-height:500px;overflow:auto;min-width:850px;'>
+<div class="input-group layui-row" style="margin:10px;">
+		<input type="text" placeholder="请输入打印机名称进行搜索" id="select-url-kw" value="" class="form-control">
+		<span class="input-group-addon btn btn-default select-btn" data-type="url">搜索</span>
+	</div>
+<table class="table table-hover supplyquery" style="min-width:850px;">
+    <tbody>   
+        
+		<?php foreach($ds as $row){ ?>
+        <tr>
+          <td>
+			   {$row['printer_name']}
+		  </td>
+          <td style="width:80px;"><a href="javascript:;" class="choose_dan_link_printers" data-json='{:json_encode($row);}'>选择</a></td>
+        </tr>
+        <?php } ?>
+        
+		<?php if(count($ds)<=0){ ?>
+        <tr> 
+            <td colspan='2' align='center'>未找到打印机</td>
+        </tr>
+		<?php } ?>
+    </tbody>
+</table>
+    </div>
+
+<script>
+var query_kwd = '{$kwd}';
+var query_url = "{:U('printer/query_printer', array('type' => $type,'template' => 'mult','unselect_printerid' => $_GPC['unselect_printerid']))}";
+var can_next = true;
+$(".select-btn").click(function(){
+	query_kwd = $.trim($("#select-url-kw").val());
+	if(!can_next)
+	{
+		return false;
+	}
+	can_next = false;
+	$.ajax({
+		url:query_url,
+		type:'post',
+		dataType:'json',
+		data:{keyword:query_kwd,is_ajax:1},
+		success:function(ret){
+			if(ret.code == 0)
+			{
+				$('.supplyquery tbody').html(ret.html);
+			//	$('#pager_ajax').html(ret.pager);	
+			}
+			can_next = true;
+		}
+	})
+});
+
+$(document).delegate(".choose_dan_link_printers","click",function(){
+	
+	//data-json
+	var json_obj = JSON.parse($(this).attr('data-json')); 
+	var p_html = '';
+	p_html+= '<div class="input-group mult_choose_printerid" data-printerid="'+json_obj.printerid+'" style="border-radius: 0;float: left;margin: 10px;margin-left:0px;width: 20%;">';
+	p_html+= '	<div class="layadmin-text-center choose_user">';
+	p_html+= '		<div class="layadmin-name" style="">'+json_obj.printer_name+'</div>';
+	p_html+= '		<button type="button" class="layui-btn layui-btn-sm" onclick="cancle_bind(this)"><i class="layui-icon">&#xe640;</i></button>';
+	p_html+= '	</div>';
+	p_html+= '</div>';
+	
+	//$(cur_open_div).parent().siblings().remove();
+	var can_tr = true;
+	$(cur_open_div).parent().siblings().each(function(){
+		 if( $(this).attr('data-printerid') == json_obj.printerid )
+		 {
+			can_tr = false;
+		 }
+	})
+	
+	if( can_tr )
+	{
+		$(cur_open_div).parent().after(p_html);
+		//$(cur_open_div).val( json_obj.gid );
+	}
+	
+	//layer.close(layer.index); 
+});
+	
+	</script>

@@ -1,0 +1,139 @@
+<div style='max-height:500px;overflow:auto;min-width:850px;'>
+<div class="input-group layui-row" style="margin:10px;">
+		<input type="text" placeholder="请输入名称进行搜索" id="select-url-kw" value="" class="form-control">
+		<span class="input-group-addon btn btn-default select-btn" data-type="url">搜索</span>
+	</div>
+<table class="table table-hover couponquery" style="min-width:850px;">
+    <tbody>
+    	<thead>
+    		<tr>
+		      <th>ID</th>
+		      <th>优惠券名称</th>
+		      <th>优惠使用条件</th>
+		      <th>剩余数量</th>
+		      <th>操作</th>
+		    </tr>
+    	</thead>
+        <?php foreach( $ds as  $row  ){ ?>
+        <tr>
+        	<td style="width:50px;">{$row['id']}</td>
+			<td style="width:200px;">
+				{$row['voucher_title']} <label class="label label-success">购物</label>
+				<?php if($row['catid'] == 1){ ?>
+					<label class="label label-primary">'.$category[$value['catid']].'</label>
+        		<?php } ?>
+        		<?php if($row['is_new_man'] == 1){ ?>
+					<label class="layui-badge">新人券</label>
+        		<?php } ?>
+			</td>
+           	<td>
+				{$row['credit']} 元<br/> 
+				<?php if( $row['limit_money']>0){ ?>
+				<span class="text-danger">满{$row['limit_money']}可用</span>
+				<?php  }else{  ?>
+				<span class="text-warning">不限</span>
+				<?php } ?>
+			</td>
+			<td>
+				<?php if( $row['total_count']==-1){ ?>无限<?php  }else{  ?>剩余：<?php echo ($row['total_count'] -  $row['send_count']) < 0 ? 0:$row['total_count'] -  $row['send_count']; ?> <?php } ?>
+			</td>
+            <td style="width:80px;">
+				<?php if($row['is_exist'] == 1){ ?>
+				<a href="javascript:;" disabled="disabled" style="color:#999;">选择</a>
+				<?php }else{ ?>
+				<a href="javascript:;" class="choose_dan_head" data-json='{:json_encode($row);}'>选择</a>
+				<?php } ?>
+			</td>
+        </tr>
+        <?php } ?>
+        <?php if( count($ds)<=0){ ?>
+        <tr> 
+            <td colspan='4' align='center'>未找到优惠券</td>
+        </tr>
+        <?php } ?>
+    </tbody>
+	<?php if( count($ds) > 0){ ?>
+	<tfoot>
+		<tr>
+			<td colspan='5' align='center' id="pager_ajax">{$pager}</td>
+		</tr>
+	</tfoot>
+	<?php } ?>
+</table>
+</div>
+<script>
+var query_kwd = '{$kwd}';
+var query_url = "{:U('Marketing/couponquery')}";
+var can_next = true;
+
+ $(document).undelegate(".choose_dan_head","click").delegate(".choose_dan_head","click",function(){
+	var json_obj = JSON.parse($(this).attr('data-json'));
+    var p_html = '';
+    p_html+= '<div class="multi-audio-item " data-id="'+json_obj.id+'">';
+    p_html+= '    <div class="input-group">';
+    p_html+= '       <input type="text" class="form-control img-textname" readonly="" value="'+json_obj.voucher_title+'">';
+    p_html+= '       <input type="hidden" value="'+json_obj.id+'" name="'+iptname+'[]">';
+    p_html+= '       <div class="input-group-btn">';
+    p_html+= '            <button class="btn btn-default" data-id="'+json_obj.id+'" onclick="cancle_coupon(this, '+json_obj.id+')" type="button"><i class="fa fa-remove"></i></button>';
+    p_html+= '       </div>';
+    p_html+= '    </div>';
+    p_html+= '</div>';
+	
+    $(cur_open_div).append(p_html);
+    layer.close(layer.index);
+});
+
+$(".select-btn").click(function(){
+	
+	query_kwd = $.trim($("#select-url-kw").val());
+	
+	var s_page = $(this).attr('page');
+	if(!can_next)
+	{
+		return false;
+	}
+	can_next = false;
+	$.ajax({
+		url:query_url,
+		type:'post',
+		dataType:'json',
+		data:{keyword:query_kwd, page:1,is_ajax:1},
+		success:function(ret){
+			if(ret.code == 0)
+			{
+				$('.couponquery tbody').html(ret.html);
+				$('#pager_ajax').html(ret.pager);
+				
+			}
+			can_next = true;
+		}
+	})
+});
+
+$("body").delegate(".pagination a","click",function(){
+	var s_page = $(this).attr('page');
+	if(!can_next)
+	{
+		return false;
+	}
+	can_next = false;
+	$.ajax({
+		url:query_url,
+		type:'post',
+		dataType:'json',
+		data:{keyword:query_kwd, page:s_page,is_ajax:1},
+		success:function(ret){
+			if(ret.code == 0)
+			{
+				$('.couponquery tbody').html(ret.html);
+				$('#pager_ajax').html(ret.pager);
+				
+			}
+			can_next = true;
+		}
+	})
+})
+
+
+
+</script>

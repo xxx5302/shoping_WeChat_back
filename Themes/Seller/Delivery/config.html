@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+  <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+  <!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  <link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+  <link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+  <script type="text/javascript">
+      window.sysinfo = {
+        <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+        <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+        <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+        <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+        'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+        'siteroot': '{$_W['siteroot']}',
+        'siteurl': '{$_W['siteurl']}',
+        'attachurl': '{$_W['attachurl']}',
+        'attachurl_local': '{$_W['attachurl_local']}',
+        'attachurl_remote': '{$_W['attachurl_remote']}',
+        'module': {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+        'cookie': {'pre': ''},
+        'account': {:json_encode($_W['account'])},
+      };
+  </script>
+        
+		
+  <script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+  <script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+  <script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+  <script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+  <script type="text/javascript" src="./resource/js/lib/jquery.nice-select.js?v=201903260001"></script>
+  <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+  <link href="/static/css/snailfish.css" rel="stylesheet">
+  <style type="text/css">
+        .img-40 {
+            width: 40px;
+            height: 40px;
+        }
+  </style>
+</head>
+<body layadmin-themealias="default">
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text">配送单设置</span></div>
+		<div class="layui-card-body" style="padding:15px;">
+			<form action="" method="post" class="layui-form" lay-filter="component-layui-form-item" enctype="multipart/form-data" >
+				
+				<div class="layui-form-item">
+				   <label class="layui-form-label">统计范围：</label>
+					<div class="layui-input-block ">
+						<input type="checkbox" lay-skin="primary" name="parameter[is_delivery_add]" class="form-control valid" <?php if( !empty($data) && $data['is_delivery_add'] ==1 ){ ?>checked<?php } ?> value="1" title="快递的订单" />
+						<br/>
+						<div class="layui-form-mid layui-word-aux">
+							勾选后，生成配送单时，将统计该团长下快递类型的订单
+						</div>
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+				    <label class="layui-form-label">拖动排序：</label>
+                    <div class="layui-input-block">
+                        <p style="padding: 8px 0;font-weight: bold;">导出相关订单表格：</p>
+    					<div class="multi-img-details">
+    						<?php $i=1; ?>
+    						<?php foreach( $columns as $key => $val ){ ?>
+    						<label class="move_item"> 
+    							<input type="checkbox" lay-ignore name="order_index" value="{$val['field']}" class="item_input" <?php if( $val['is_check'] ==1 ){ ?>checked<?php } ?> title=""  /><?php echo $val['title']; ?>&nbsp;&nbsp;&nbsp;&nbsp;
+    						</label>
+    						<?php 
+    							if( $i % 8 == 0 )
+    							{
+    								echo '<br/><br/>';
+    							}
+    							$i++; 
+    						?>
+    						<?php } ?>	
+    					</div>
+                    </div>
+				</div>
+				
+				<div class="layui-form-item">
+				   <label class="layui-form-label">导出商品总单范围：</label>
+					<div class="layui-input-block ">
+						<input type="checkbox" lay-skin="primary" name="parameter[is_export_deliverygoods_category]" class="form-control valid" <?php if( !empty($data) && $data['is_export_deliverygoods_category'] ==1 ){ ?>checked<?php } ?> value="1" title="导出商品分类" />
+						<input type="checkbox" lay-skin="primary" name="parameter[is_export_deliverygoods_supply]" class="form-control valid" <?php if( !empty($data) && $data['is_export_deliverygoods_supply'] ==1 ){ ?>checked<?php } ?> value="1" title="导出商品所属供应商" />
+						<br/>
+						<div class="layui-form-mid layui-word-aux">
+							配送单管理 - 导出商品总单 -是否打印 商品分类，商品所属供应商
+						</div>
+					</div>
+				</div>
+		
+        		<div class="layui-form-item">
+        			<label class="layui-form-label"> </label>
+        			<div class="layui-input-block">
+						<input type="hidden" name="modify_explode_arr" id="modify_explode_arr" value="" />
+        				
+        				<input type="submit" value="提交" lay-submit lay-filter="formDemo" class="btn btn-primary"  />
+        				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        			</div>
+        		</div>
+		  </form>
+	   </div>
+    </div>
+</div>
+
+<script src="/layuiadmin/layui/layui.js"></script>
+
+
+<script type="text/javascript" src="/static/js/jquery-migrate-1.1.1.js"></script>
+
+<script src="/static/js/jquery-ui.min.js"></script>
+
+<script>
+    layui.config({
+        base: '/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use('index');
+</script>
+
+<script>
+var layer = layui.layer;
+var $;
+
+layui.use(['jquery', 'layer', 'form'], function(){ 
+    $ = layui.$;
+    var form = layui.form;
+  
+  
+
+
+
+  $('#clerk_allprint,#clerk_allprint_order').click(function(){
+		var searchtime = $('#searchtime').val();
+		
+		var start = $('input[name="time[start]"]').val();
+		var end = $('input[name="time[end]"]').val();
+		
+		var s_url= $(this).attr('data-href');
+		
+		s_url += '&searchtime='+searchtime+"&start="+start+"&end="+end;
+		
+		window.open(s_url);
+		
+		//console.log( start );
+		//console.log(searchtime);
+		//name="time[start]"
+		//time[end]
+	})
+	
+    $('.deldom').click(function(){
+        var s_url = $(this).attr('data-href');
+        layer.confirm($(this).attr('data-confirm'), function(index){
+            $.ajax({
+                url:s_url,
+                type:'post',
+                dataType:'json',
+                success:function(info){
+                
+                    if(info.status == 0)
+                    {
+                        layer.msg(info.result.message,{icon: 1,time: 2000});
+                    }else if(info.status == 1){
+                        var go_url = location.href;
+                        if( info.result.hasOwnProperty("url") )
+                        {
+                            go_url = info.result.url;
+                        }
+                        
+                        layer.msg('操作成功',{time: 1000,
+                            end:function(){
+                                location.href = info.result.url;
+                            }
+                        }); 
+                    }
+                }
+            })
+        }); 
+    })
+    
+    $('.btn-operation').click(function(){
+        var ids_arr = [];
+        var obj = $(this);
+        var s_toggle = $(this).attr('data-toggle');
+        var s_url = $(this).attr('data-href');
+        
+        
+        $("input[name=item_checkbox]").each(function() {
+            
+            if( $(this).prop('checked') )
+            {
+                ids_arr.push( $(this).val() );
+            }
+        })
+        if(ids_arr.length < 1)
+        {
+            layer.msg('请选择要操作的内容');
+        }else{
+            var can_sub = true;
+            if( s_toggle == 'batch-remove' )
+            {
+                can_sub = false;
+                
+                layer.confirm($(obj).attr('data-confirm'), function(index){
+                     $.ajax({
+                        url:s_url,
+                        type:'post',
+                        dataType:'json',
+                        data:{ids:ids_arr},
+                        success:function(info){
+                        
+                            if(info.status == 0)
+                            {
+                                layer.msg(info.result.message,{icon: 1,time: 2000});
+                            }else if(info.status == 1){
+                                var go_url = location.href;
+                                if( info.result.hasOwnProperty("url") )
+                                {
+                                    go_url = info.result.url;
+                                }
+                                
+                                layer.msg('操作成功',{time: 1000,
+                                    end:function(){
+                                        location.href = info.result.url;
+                                    }
+                                }); 
+                            }
+                        }
+                    })
+                }); 
+            }else{
+                $.ajax({
+                    url:s_url,
+                    type:'post',
+                    dataType:'json',
+                    data:{ids:ids_arr},
+                    success:function(info){
+                    
+                        if(info.status == 0)
+                        {
+                            layer.msg(info.result.message,{icon: 1,time: 2000});
+                        }else if(info.status == 1){
+                            var go_url = location.href;
+                            if( info.result.hasOwnProperty("url") )
+                            {
+                                go_url = info.result.url;
+                            }
+                            
+                            layer.msg('操作成功',{time: 1000,
+                                end:function(){
+                                    location.href = info.result.url;
+                                }
+                            }); 
+                        }
+                    }
+                })
+            }
+        }
+    })
+  
+    form.on('switch(statewsitch)', function(data){
+      
+      var s_url = $(this).attr('data-href')
+      
+      var s_value = 1;
+      if(data.elem.checked)
+      {
+        s_value = 1;
+      }else{
+        s_value = 0;
+      }
+      
+      $.ajax({
+            url:s_url,
+            type:'post',
+            dataType:'json',
+            data:{value:s_value},
+            success:function(info){
+            
+                if(info.status == 0)
+                {
+                    layer.msg(info.result.message,{icon: 1,time: 2000});
+                }else if(info.status == 1){
+                    var go_url = location.href;
+                    if( info.result.hasOwnProperty("url") )
+                    {
+                        go_url = info.result.url;
+                    }
+                    
+                    layer.msg('操作成功',{time: 1000,
+                        end:function(){
+                            location.href = info.result.url;
+                        }
+                    }); 
+                }
+            }
+        })
+    });
+
+    form.on('checkbox(checkboxall)', function(data){
+      if(data.elem.checked)
+      {
+        $("input[name=item_checkbox]").each(function() {
+            $(this).prop("checked", true);
+        });
+        $("input[name=checkall]").each(function() {
+            $(this).prop("checked", true);
+        });
+        
+      }else{
+        $("input[name=item_checkbox]").each(function() {
+            $(this).prop("checked", false);
+        });
+        $("input[name=checkall]").each(function() {
+            $(this).prop("checked", false);
+        });
+      }
+      
+      form.render('checkbox');
+    });
+  
+    //监听提交
+    form.on('submit(formDemo)', function(data){
+	
+		var arr_box = [];
+		$('.item_input').each(function() {
+			
+			if( $(this).is(':checked') ) {
+				arr_box.push($(this).val());
+			}
+		});
+		
+		
+		data.field.modify_explode_arr = arr_box;
+		
+		
+        $.ajax({
+            url: data.form.action,
+            type: data.form.method,
+            data: data.field,
+            dataType:'json',
+            success: function (info) {
+              
+                if(info.status == 0)
+                {
+                    layer.msg(info.result.message,{icon: 1,time: 2000});
+                }else if(info.status == 1){
+                    var go_url = location.href;
+                    if( info.result.hasOwnProperty("url") )
+                    {
+                        go_url = info.result.url;
+                    }
+                    
+                    layer.msg('操作成功',{time: 1000,
+                        end:function(){
+                            location.href = info.result.url;
+                        }
+                    }); 
+                }
+            }
+        });
+        return false;
+    });
+})
+
+</script>  
+
+
+<script>
+    $(function () {
+        // 拖拽时开始滚动的间距
+        var scrollingSensitivity = 20
+        // 拖拽时滚动速度
+        let scrollingSpeed = 20
+        // 拖拽前的父级节点
+        let dragBeforeParentNode = null
+        // 初始化拖拽函数
+        $('.multi-img-details').sortable({
+            // 自适应placeholder的大小
+            forceHelperSize: true,
+            // 拖拽时的鼠标形状
+            cursor: '-webkit-grabbing',
+            // 拖拽的父级节点(该节点一定要注意，配置错误会导致当前屏幕外的元素没法自动滚动拖拽，两列之间拖拽的滚动也会出问题)
+            appendTo: '.layui-form-item',
+            // 拖拽时的倾斜度
+            rotate: '5deg',
+            // 延迟时间(毫秒)，避免和click同时操作时出现的冲突
+            delay: 0,
+           
+            // 拖拽到边框出现滚动的间距，
+            scrollSensitivity: scrollingSensitivity,
+            // 应用于拖拽空白区域的样式
+            placeholder: 'portlet-placeholder ui-state-highlight',
+            // 允许拖拽预留空白区域
+            forcePlaceholderSize: false,
+            // 多个列表之间的拖拽的dom元素
+            connectWith: '.multi-img-details',
+            // 鼠标到区域则填充
+            tolerance: "pointer",
+            // 可以拖拽的项
+            items: '.move_item',
+            // 填充动画
+            revert: 0,
+            // 拖拽结束函数
+            stop: (e, ui) => {
+                // 当前拽入的元素
+                let item = $(ui.item)
+                // 当前拽入元素的下标
+                let index = item.index()
+                let kid = ''
+                // xxxx 这里面可以操作数据更新
+            },
+            // 开始拖拽时的函数
+            start: (e, ui) => {
+                // 拖拽前的父级节点
+                dragBeforeParentNode = ui.item[0].parentNode
+                // 让placeholder和源高度一致
+                ui.helper.addClass('item').width(110)
+                // xxxx  这里可以记录一些拖拽前的元素属性
+            },
+            // 处理两列滚动条问题
+            sort: function (event, ui) {
+                var scrollContainer = ui.placeholder[0].parentNode
+                // 设置拽入的列表的滚动位置
+                var overflowOffset = $(scrollContainer).offset()
+                if ((overflowOffset.top + scrollContainer.offsetHeight) - event.pageY <
+                    scrollingSensitivity) {
+                    scrollContainer.scrollTop = scrollContainer.scrollTop + scrollingSpeed
+                } else if (event.pageY - overflowOffset.top < scrollingSensitivity) {
+                    scrollContainer.scrollTop = scrollContainer.scrollTop - scrollingSpeed
+                }
+            }
+        }).disableSelection()
+    })
+</script>
+
+</body>
+</html>
+

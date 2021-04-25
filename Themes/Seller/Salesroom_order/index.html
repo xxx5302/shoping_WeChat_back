@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+ 
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->  
+
+<link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+<link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+<script type="text/javascript">
+  window.sysinfo = {
+  <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+  
+  <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+  
+  <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+  
+  <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+  
+  'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+  
+  'siteroot': '{$_W['siteroot']}',
+    'siteurl': '{$_W['siteurl']}',
+    'attachurl': '{$_W['attachurl']}',
+    'attachurl_local': '{$_W['attachurl_local']}',
+    'attachurl_remote': '{$_W['attachurl_remote']}',
+    'module' : {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+    'cookie' : {'pre': ''},
+    'account' : {:json_encode($_W['account'])},
+  };
+</script>
+
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/lib/jquery.nice-select.js?v=201903260001"></script>
+<link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+<link href="/static/css/snailfish.css" rel="stylesheet">
+  <style>
+    .layui-table[lay-size=lg] td, .layui-table[lay-size=lg] th {
+      padding: 15px 10px;
+    }
+    .product-info{padding-left: 80px;padding-top: 20px;}
+    .tDiv img{float:left;}
+	.hxBtn{color:#428bca;}
+  </style>
+</head>
+<body layadmin-themealias="default">
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text">核销订单记录<?php if(!empty($salesroom)){ ?><span style="color:red;">({$salesroom.room_name})</span></span><?php } ?></div>
+    <div class="layui-tab layui-tab-brief">
+      <ul class="layui-tab-title">
+        <li <?php if(empty($state)){ ?>class="layui-this"<?php } ?>><a href="{:U('salesroom_order/index',array('salesroom_id'=>$salesroom_id))}">所有订单</a></li>
+        <li <?php if(!empty($state) && $state == 1){ ?>class="layui-this"<?php } ?>><a href="{:U('salesroom_order/index', array('state' => 1,'salesroom_id'=>$salesroom_id))}">待核销（待收货）</a></li>
+        <li <?php if(!empty($state) && $state == 2){ ?>class="layui-this"<?php } ?>><a href="{:U('salesroom_order/index', array('state' => 2,'salesroom_id'=>$salesroom_id))}">已核销（已完成）</a></li>
+        <li <?php if(!empty($state) && $state == 3){ ?>class="layui-this"<?php } ?>><a href="{:U('salesroom_order/index', array('state' => 3,'salesroom_id'=>$salesroom_id))}">已取消</a></li>
+        <li <?php if(!empty($state) && $state == 4){ ?>class="layui-this"<?php } ?>><a href="{:U('salesroom_order/index', array('state' => 4,'salesroom_id'=>$salesroom_id))}">已过期</a></li>
+      </ul>
+    </div>
+    <div class="layui-card-body" style="padding:15px;">
+      <form action="" method="get" class="form-horizontal form-search layui-form" role="form">
+        <input type="hidden" name="c" value="salesroom_order" />
+        <input type="hidden" name="salesroom_id" value="{$salesroom_id}"/>
+        <input type="hidden" name="state" value="{$state}"/>
+        <div class="layui-form-item">
+          <div class="layui-inline">
+          <div class="layui-input-inline" style="width: 300px;">
+            <input type="text" class="layui-input" name='keyword' value="{$keyword}" placeholder="请输入买家姓名/手机号/会员名/订单号">
+          </div>
+          <div class="layui-input-inline">
+			<select name='searchtime' class='form-control' style="width:100px;padding:0 5px;"  id="searchtime">
+				<option value=''>不按时间</option>
+				<option value='create_time' <?php if( $searchtime =='create_time' ){ ?>selected<?php } ?>>下单时间</option>
+			</select>
+		 </div>
+		 <div class="layui-input-inline" style="width: 285px;">
+				{:tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d H:i', $starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+		 </div>
+          <div class="layui-input-inline">
+            <button class="layui-btn layui-btn-sm"  type="submit"> 搜索</button>
+          </div>
+          </div>
+        </div>
+        
+      </form>
+      <form action="" class="layui-form" lay-filter="example" method="post" >
+        <div class="row">
+          <div class="col-md-12">
+            <table class="layui-table" lay-skin="line" lay-size="lg">
+              <thead>
+                <tr>
+                  <th style="width:20%">商品</th>
+                  <th style="width:10%;">会员名称</th>
+                  <th style="width:8%;">配送/支付</th>
+                  <th style="width:12%;">团长/店铺</th>
+                  <th style="width:12%;">核销人员/核销门店</th>
+                  <th style="width:10%;">订单总额</th>
+                  <th style="width: 100px;">订单状态</th>
+                  <th style="width: 250px;">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+              <?php if(!empty($list)){
+                    foreach( $list as  $item  ){ ?>
+              	<tr class="tr-order-sn">
+					<td colspan="8">
+						<div class="tDiv ml10">						
+                            <span class="words">订单号： {$item['order_num_alias']}</span>
+                            <span class="words">下单时间：{$item['date_added']}</span>
+						</div>
+					</td>
+				</tr>
+                <tr>
+                  <td>
+                    <div class="tDiv relative tpinfo last ">
+		            	<div class="img">
+		            		<img width="70" height="70" src="<?php echo tomedia($item['goods_images']);?>" alt="">
+		            	</div>
+		                <div class="product-info">
+		                	<div class="name mb5">{$item['goods_name']}</div>
+		                </div>
+					</div>
+                  </td>
+                  <td>
+                    {$item['shipping_name']}<br/>
+                    {$item['telephone']}<br/>
+                    	会员名：<span style="color:#428bca;">{$item['member_name']}</span>
+                  </td>
+                  <td>
+                    <?php if( $item['payment_code']=='yuer'){ ?>
+					   <span> <i class="text-warning" style="font-size: 17px;"></i><span>余额支付</span></span>
+					<?php }else if( $item['payment_code']=='admin' ){ ?>
+					   <span> <i class=" text-danger" style="font-size: 17px"></i>后台付款</span>
+					<?php  }else{  ?>
+					   <span class="line-text"> 微信支付</span>
+					<?php } ?>
+					<span class="line-text"><br/>(到店核销)</span>
+                  </td>
+                  <td>
+                    <div class="tDiv" style="text-align: left;">
+						<div style='margin-top:5px;display:block;'>
+							{$item['head_name']}
+						</div>
+						<div style='margin-top:5px;display:block;'>
+							电话：{$item['head_mobile']}
+						</div>
+						 <div style='margin-top:5px;display:block;cursor: pointer;' >
+							<font style="color: #999;">小区：</font>  <font class="line-text">{$item['community_name']}   ({$item['province']} {$item['city']})
+						</div>
+					</div>
+                  </td>
+                  <td>
+                    <?php 
+						if($item['is_hexiao_over'] == 1){ 
+                    ?>	
+                    	<div class="tDiv" style="text-align: left;">
+							<div style='margin-top:5px;display:block;'>
+								姓名：{$item['smember_name']}
+							</div>
+							<div style='margin-top:5px;display:block;'>
+								手机号：{$item['smember_mobile']}
+							</div>
+							 <div style='margin-top:5px;display:block;cursor: pointer;' >
+								门店：{$item['salesroom_name']}
+							</div>
+						</div>
+                    <?php } ?>
+                  </td>
+                  <td>
+                    <div class="tDiv" style="text-align: left;">
+						<div style='margin-top:5px;display:block;'>
+							运&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;费：{$item['shipping_fare']}
+						</div>
+						<div style='margin-top:5px;display:block;'>
+							商品小计：<?php echo round($item['price']*$item['quantity'],2); ?>
+						</div>
+						 <div style='margin-top:5px;display:block;cursor: pointer;' >
+							应收总款：<?php echo round($item['total'],2); ?>
+						</div>
+					</div>
+                  </td>
+                  <td>
+                    <?php if($item['order_status_id'] == 3){ ?>
+                      <span style="color:#a29e9e;">待付款</span><br/>
+                    <?php }else if($item['order_status_id'] == 5){ ?>
+                      <span style="color:#a29e9e;">已取消</span><br/>
+                    <?php }else{ ?>
+                  	<?php if($item['is_hexiao_over'] == 1){ ?>
+                  		<span style="color:#009688;">已完成</span><br/>
+                  		<a class="hxBtn"  href="javascript:;" data-href="{:U('order/view_hexiao_history', array('id' => $item['order_id'],'order_goods_id'=>$item['order_goods_id']))}">(核销记录)</a>
+                  	<?php }else if($item['is_hexiao_over'] == 0){ ?>
+                  		<span style="color:red;">待使用</span>
+                  	    <?php if($item['record_count'] > 0){ ?>
+                          <br/>
+                  		  <a class="hxBtn"  href="javascript:;" data-href="{:U('order/view_hexiao_history', array('id' => $item['order_id'],'order_goods_id'=>$item['order_goods_id']))}">(部分使用)</a>
+                        <?php } ?>
+                 	<?php }else if($item['is_hexiao_over'] == 2){ ?>
+                       <span style="color:red;">已过期</span><br/>
+                        <?php if($item['record_count'] > 0){ ?>
+                        <a class="hxBtn"  href="javascript:;" data-href="{:U('order/view_hexiao_history', array('id' => $item['order_id'],'order_goods_id'=>$item['order_goods_id']))}">(部分使用)</a>
+                        <?php } ?>
+                    <?php } } ?>
+                  </td>
+                  <td style="overflow:visible;position:relative">
+                    <a class='layui-btn layui-btn-xs' href="{:U('order/detail', array('id'=>$item['order_id']))}" >
+                     	 查看详情
+                    </a>
+                  </td>
+                </tr>
+              <?php }}else{ ?>
+              <tr>
+                <td colspan="8" style="text-align: center;color:red;">
+                  暂无数据！
+                </td>
+              </tr>
+              <?php } ?>
+              </tbody>
+              <tfoot>
+              <tr>
+                <td colspan="8" style="text-align: right">
+                  {$pager}
+                </td>
+              </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="/layuiadmin/layui/layui.js"></script>
+
+<script>
+  layui.config({
+    base: '/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use('index');
+</script>
+
+<script>
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+var layer = layui.layer;
+var $;
+
+layui.use(['jquery', 'layer','form'], function(){ 
+  $ = layui.$;
+  var form = layui.form;
+  
+  $('.hxBtn').click(function(){
+		var url = $(this).attr('data-href');
+		$.post(url, {}, function(shtml){
+		 layer.open({
+			type: 1,
+			area: '930px',
+			content: shtml //注意，如果str是object，那么需要字符拼接。
+		  });
+		});
+	   return false;
+	})
+  
+
+})
+
+</script>  
+</body>
+</html>
+
+

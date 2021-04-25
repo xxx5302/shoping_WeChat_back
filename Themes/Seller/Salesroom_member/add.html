@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+ 
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->  
+
+    <link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+    <link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+    <script type="text/javascript">
+        window.sysinfo = {
+            <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+            <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+            <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+            <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+            'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+            'siteroot': '{$_W['siteroot']}',
+            'siteurl': '{$_W['siteurl']}',
+            'attachurl': '{$_W['attachurl']}',
+            'attachurl_local': '{$_W['attachurl_local']}',
+            'attachurl_remote': '{$_W['attachurl_remote']}',
+            'module' : {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+            'cookie' : {'pre': ''},
+            'account' : {:json_encode($_W['account'])},
+        };
+    </script>
+            
+    <script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+    <script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+    <script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+    <script type="text/javascript" src="./resource/js/lib/jquery.nice-select.js?v=201903260001"></script>
+    <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+    <link href="/static/css/snailfish.css" rel="stylesheet">
+</head>
+<body layadmin-themealias="default">
+
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text"><?php if( !empty($item['id'])){ ?>编辑<?php  }else{  ?>新增<?php } ?>核销人员<?php if( !empty($item['id'])){ ?>({$item['username']})<?php } ?></span></div>
+            <div class="layui-card-body" style="padding:15px;">
+                <form action="" method="post" class="layui-form" lay-filter="component-layui-form-item" enctype="multipart/form-data" >
+                    <input type="hidden" name="data[id]" value="{$item['id']}"/>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color:red;">*&nbsp;</span>核销员姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" id='room_name' name="data[username]" class="form-control" value="{$item['username']}" lay-verify="required">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color:red;">*&nbsp;</span>核销员手机号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[mobile]" class="form-control" value="{$item['mobile']}"  lay-verify="required"/>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color:red;">*&nbsp;</span>关联会员</label>
+                        <div class="layui-input-block">
+                            <div class="input-group " style="margin: 0;">
+                                <input type="text" disabled value="{$item['member_id']}" class="form-control valid" name="data[member_id]" placeholder="" id="member_id">
+                                <span class="input-group-btn">
+                                    <span data-input="#member_id" id="chose_member_id"  class="btn btn-default">选择会员</span>
+                                </span>
+                            </div>
+                            <?php if($member_info){ ?>
+                            <div class="input-group " style="margin: 0;">
+                                <div class="layadmin-text-center choose_user">
+                                    <img style="" src="{$member_info['avatar']}">
+                                    <div class="layadmin-maillist-img" style="">{$member_info['nickname']}</div>
+                                    <button type="button" class="layui-btn layui-btn-sm" onclick="cancle_bind(this);"><i class="layui-icon">&#xe640;</i></button>
+                                </div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color:red;">*&nbsp;</span>所属门店</label>
+                        <div class="layui-input-block">
+                            <div class="input-group " style="margin: 0;">
+                                <input type="text" disabled value="" class="form-control valid" placeholder="" id="salesroom_id">
+                                <span class="input-group-btn">
+                                    <span data-input="#salesroom_id" id="chose_salesroom_id"  class="btn btn-default">选择门店</span>
+                                </span>
+                            </div>
+                            <?php
+                            if($room_list){
+                            foreach($room_list as $k=>$v){
+                            ?>
+                            <div class="input-group mult_choose_roomid" data-roomid="{$v['id']}" style="border-radius: 0;float: left;margin: 10px;margin-left:0px;">
+                                <div class="layadmin-text-center choose_user">
+                                    <img style="" src="{:tomedia($v['room_logo'])}">
+                                    <div class="layadmin-maillist-img" style="">{$v['room_name']}</div>
+                                    <button type="button" class="layui-btn layui-btn-sm" onclick="cancle_room_bind(this)"><i class="layui-icon"></i></button>
+                                </div>
+                            </div>
+                            <?php }} ?>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <input type='radio' name='data[state]' title="启用" value=1 <?php if( $item['state']==1 || empty($item)){ ?>checked<?php } ?> />
+                            <input type='radio' name='data[state]' title="禁用" value=0 <?php if( $item['state']==0 && !empty($item) ){ ?>checked<?php } ?> />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"> </label>
+                        <div class="layui-input-block">
+                            <input type="submit" value="提交" lay-submit lay-filter="formDemo" class="btn btn-primary"  />
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/layuiadmin/layui/layui.js"></script>
+    <script src="/static/js/jquery-sortable.js"></script>
+    <script>
+        layui.config({
+            base: '/layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use('index');
+    </script>
+    <script>
+
+        var layer = layui.layer;
+        var $;
+        var cur_open_div;
+        layui.use(['jquery', 'layer','form','laydate'], function(){
+          $ = layui.$;
+          var form = layui.form;
+
+            $('#chose_member_id').click(function(){
+                cur_open_div = $(this).attr('data-input');
+                $.post("{:U('user/zhenquery', array('ok' => 1))}", {}, function(shtml){
+                    layer.open({
+                        type: 1,
+                        area: '930px',
+                        content: shtml //注意，如果str是object，那么需要字符拼接。
+                    });
+                });
+            })
+            $('#chose_salesroom_id').click(function(){
+                cur_open_div = $(this).attr('data-input');
+                $.post("{:U('salesroom/query', array('template' => 'mult'))}", {}, function(shtml){
+                    layer.open({
+                        type: 1,
+                        area: '930px',
+                        content: shtml //注意，如果str是object，那么需要字符拼接。
+                    });
+                });
+            })
+
+
+            var is_post = true;
+            //监听提交
+            form.on('submit(formDemo)', function(data){
+                var member_id = $.trim($('#member_id').val());
+                if(member_id == ''){
+                    layer.msg('请选择关联会员',{icon: 2,time: 2000});
+                    return false;
+                }
+                var room_ar = [];
+                var room_str = '';
+                $('.mult_choose_roomid').each(function(){
+                    room_ar.push( $(this).attr('data-roomid') );
+                })
+                room_str = room_ar.join(',');
+                if(room_str == ''){
+                    layer.msg('请选择所属门店',{icon: 2,time: 2000});
+                    return false;
+                }
+                data.field.salesroom_ids = room_str;
+                if(is_post){
+                    is_post = false;
+                    $.ajax({
+                        url: data.form.action,
+                        type: data.form.method,
+                        data: data.field,
+                        dataType:'json',
+                        success: function (info) {
+                            if(info.status == 0)
+                            {
+                                layer.msg(info.result.message,{icon: 1,time: 2000});
+                                is_post = true;
+                            }else if(info.status == 1){
+                                var go_url = location.href;
+                                if( info.result.hasOwnProperty("url") )
+                                {
+                                    go_url = info.result.url;
+                                }
+
+                                layer.msg('操作成功',{time: 1000,
+                                    end:function(){
+
+                                        var backurl = "{:U('salesroom_member/index',array('ok'=>'1'))}";
+                                        location.href = backurl;
+                                        // location.href = info.result.url;
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+                return false;
+            });
+        })
+
+        function cancle_bind(obj)
+        {
+            $('#member_id').val('');
+            $(obj).parent().parent().remove();
+        }
+
+        function cancle_room_bind(obj){
+            $(obj).parent().parent().remove();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+ 
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->  
+
+<link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+<link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+<script type="text/javascript">
+            window.sysinfo = {
+            <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+			
+            <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+			
+            <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+			
+            <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+			
+            'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+			
+            'siteroot': '{$_W['siteroot']}',
+                    'siteurl': '{$_W['siteurl']}',
+                    'attachurl': '{$_W['attachurl']}',
+                    'attachurl_local': '{$_W['attachurl_local']}',
+                    'attachurl_remote': '{$_W['attachurl_remote']}',
+                    'module' : {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+            'cookie' : {'pre': ''},
+            'account' : {:json_encode($_W['account'])},
+            };
+        </script>
+		
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/lib/jquery.nice-select.js?v=201903260001"></script>
+<link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+<link href="/static/css/snailfish.css" rel="stylesheet">
+<style>
+	body.dragging, body.dragging * {
+		cursor: move !important;
+	}
+	.dragged {
+		position: absolute;
+		opacity: 0.5;
+		z-index: 2000;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		background: #fff;
+	}
+	#sortable li {
+		border-top: 1px solid #c5c5c5;
+		padding-top: 20px;
+	}
+	#sortable li:first-child {
+		border: 0;
+	}
+	#sortable li.placeholder {
+		position: relative;
+	}
+	#sortable li.placeholder:before {
+		position: absolute;
+	}
+</style>
+
+	<script type="text/javascript" src="/static/js/dist/area/cascade.js"></script>
+	<script src="https://map.qq.com/api/js?v=2.exp&key=6R4BZ-WAB3W-JITRG-OE7GY-R2753-P3BZ2" type="text/javascript" charset="utf-8"></script>
+</head>
+<body layadmin-themealias="default">
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header layui-elem-quote">同城配送设置</div>
+		<div class="layui-card-body" style="padding:15px;">
+			<form action="" method="post" class="layui-form" lay-filter="component-layui-form-item" enctype="multipart/form-data" >
+
+
+
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">
+
+						同城配送
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="关闭" lay-filter="formopenlocaltowndelivery"  name='parameter[isopen_localtown_delivery]' value='0' <?php if(!isset($data['isopen_localtown_delivery']) || $data['isopen_localtown_delivery'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="开启" lay-filter="formexpress"  name='parameter[isopen_localtown_delivery]' value='1' <?php if( isset($data['isopen_localtown_delivery']) && $data['isopen_localtown_delivery'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+					</div>
+				</div>
+				<div class="layui-form-item layui-hide">
+					<label class="layui-form-label">
+						<i class="fa fa-arrows-alt text-primary"></i>
+						配送模式
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="平台配送"  name='parameter[localtown_delivery_type]' value='0' <?php if(!isset($data['localtown_delivery_type']) || $data['localtown_delivery_type'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="商家配送"   name='parameter[localtown_delivery_type]' value='1' <?php if( isset($data['localtown_delivery_type']) && $data['localtown_delivery_type'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">
+						出单时长
+					</label>
+					<div class="layui-input-block">
+						<div class="input-group fixsingle-input-group">
+							<input class="form-control" name="parameter[localtown_outorder_time]" type="text" placeholder="" value="{$data['localtown_outorder_time']}">
+							<div class="input-group-addon">分</div>
+						</div>
+						<span class='layui-form-mid'>订单制作时长或者订单打包时长</span>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">
+						配送时长
+					</label>
+					<div class="layui-input-block">
+						<div class="input-group fixsingle-input-group">
+							<input class="form-control" name="parameter[localtown_delivery_time]" type="text" placeholder="" value="{$data['localtown_delivery_time']}">
+							<div class="input-group-addon">分</div>
+						</div>
+						<span class='layui-form-mid'>订单从商家到达用户手中的时长</span>
+					</div>
+				</div>
+
+
+				<div class="layui-form-item layui-hide">
+					<label class="layui-form-label">
+						<i class="fa fa-arrows-alt text-primary"></i>
+						订单自动派单
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="开启"  name='parameter[localtown_auto_dispatch]' value='0' <?php if(!isset($data['localtown_auto_dispatch']) || $data['localtown_auto_dispatch'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="关闭"   name='parameter[localtown_auto_dispatch]' value='1' <?php if( isset($data['localtown_auto_dispatch']) && $data['localtown_auto_dispatch'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+					</div>
+				</div>
+
+
+				<div class="layui-form-item layui-hide">
+					<label class="layui-form-label">
+						<i class="fa fa-arrows-alt text-primary"></i>
+						同城配送距离外是否允许下单
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="允许"  lay-filter="formlocaltownisallowmaxdistancebuy" name='parameter[localtown_isallow_maxdistancebuy]' value='0' <?php if(!isset($data['localtown_isallow_maxdistancebuy']) || $data['localtown_isallow_maxdistancebuy'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="不允许" lay-filter="formlocaltownisallowmaxdistancebuy"  name='parameter[localtown_isallow_maxdistancebuy]' value='1' <?php if( isset($data['localtown_isallow_maxdistancebuy']) && $data['localtown_isallow_maxdistancebuy'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+						<div class="layui-form-mid layui-word-aux">距离大于服务距离时是否允许下单，注意：手机定位精确性受天气、用户终端设备是否开启GPS以及硬件配置等影响很大，若此项设置为不允许下单</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">服务距离</label>
+					<div class='layui-input-block'>
+						<div class="input-group fixsingle-input-group">
+							<input class="form-control" name="parameter[localtown_servvice_maxdistance]" type="text" placeholder="" value="{$data['localtown_servvice_maxdistance']}">
+							<div class="input-group-addon">KM</div>
+						</div>
+						<div class="layui-form-mid layui-word-aux">用户与商家的距离</div>
+					</div>
+				</div>
+
+
+				<div class="layui-form-item ">
+					<label class="layui-form-label">
+
+						配送费
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="固定金额" lay-filter="formlocaltowndeliverymoneytype" name='parameter[localtown_delivery_moneytype]' value='0' <?php if(!isset($data['localtown_delivery_moneytype']) || $data['localtown_delivery_moneytype'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="按距离收取" lay-filter="formlocaltowndeliverymoneytype" name='parameter[localtown_delivery_moneytype]' value='1' <?php if( isset($data['localtown_delivery_moneytype']) && $data['localtown_delivery_moneytype'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+						<div class="layui-form-mid layui-word-aux"></div>
+					</div>
+				</div>
+
+				<div class="layui-form-item" id="fixed_deliverymoney_set" <?php if( isset($data['localtown_delivery_moneytype']) && $data['localtown_delivery_moneytype'] ==1 ){ ?> style="display:none; <?php } ?>>
+					<label class="layui-form-label"></label>
+					<div class="layui-input-block">
+						<div class="input-group fixsingle-input-group">
+							<div class="input-group-addon">配送费</div>
+							<input class="form-control" name="parameter[localtown_moneytype_fixed_money]" type="text" placeholder="" value="{$data['localtown_moneytype_fixed_money']}">
+
+							<div class="input-group-addon">起送价格</div>
+							<input class="form-control" name="parameter[localtown_moneytype_fixed_deliverymoney]" type="text" placeholder="" value="{$data['localtown_moneytype_fixed_deliverymoney']}">
+							<div class="input-group-addon">元，达到</div>
+							<input class="form-control" name="parameter[localtown_moneytype_fixed_freemoney]" type="text" placeholder="" value="{$data['localtown_moneytype_fixed_freemoney']}">
+							<div class="input-group-addon">元 免配送费</div>
+						</div>
+						<span class='layui-form-mid'>同城配送订单的起送价格以及配送价格（免配送费条件设置 0 的时候，表示不减免配送费）</span>
+					</div>
+				</div>
+
+				<div class="layui-form-item" id="basedistance_deliverymoney_set" <?php if(!isset($data['localtown_delivery_moneytype']) || $data['localtown_delivery_moneytype'] ==0){ ?> style="display:none;" <?php } ?>>
+					<label class="layui-form-label"></label>
+					<div class="layui-input-block">
+						<div class="input-group fixsingle-input-group">
+							<div class="input-group-addon">起步价</div>
+							<input class="form-control" name="parameter[localtown_moneytype_basedistance_deliverymoney]" type="text" placeholder="" value="{$data['localtown_moneytype_basedistance_deliverymoney']}">
+							<div class="input-group-addon">元，超过</div>
+							<input class="form-control" name="parameter[localtown_moneytype_basedistance]" type="text" placeholder="" value="{$data['localtown_moneytype_basedistance']}">
+							<div class="input-group-addon">KM , 超过每KM增加</div>
+							<input class="form-control" name="parameter[localtown_moneytype_base_perkmaddmoney]" type="text" placeholder="" value="{$data['localtown_moneytype_base_perkmaddmoney']}">
+							<div class="input-group-addon">元 , 最高收取</div>
+							<input class="form-control" name="parameter[localtown_moneytype_base_maxdeliverymoney]" type="text" placeholder="" value="{$data['localtown_moneytype_base_maxdeliverymoney']}">
+							<div class="input-group-addon">元</div>
+						</div>
+						<span class='layui-form-mid'>计费规则：例如设置 起步3km内5元，每增加 1km 加 1 元，超过6km，每增加 1km 加 2 元。如果配送距离5km，配送费：5 + （5-3）X 1 = 7元；配送距离8km，配送费：5 + （8-3）X 2 = 15元。</span>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">确认送达距离</label>
+					<div class='layui-input-block'>
+						<div class="input-group fixsingle-input-group">
+							<input class="form-control" name="parameter[localtown_confirm_delivery_distance]" type="text" placeholder="" value="{$data['localtown_confirm_delivery_distance']}">
+							<div class="input-group-addon">m</div>
+						</div>
+						<div class="layui-form-mid layui-word-aux">配送员与用户间距离在此范围内时可以点击送达，最小10米</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">配送员抢单距离</label>
+					<div class='layui-input-block'>
+						<div class="input-group fixsingle-input-group">
+							<input class="form-control" name="parameter[localtown_grabbing_distance]" type="text" placeholder="" value="{$data['localtown_grabbing_distance']}">
+							<div class="input-group-addon">m</div>
+						</div>
+						<div class="layui-form-mid layui-word-aux">配送员与商家间距离在此范围内时可以点击抢单，最小10米</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">
+
+						购买多件商品时包装费
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="叠加"  name='parameter[localtown_superposition_pickingmoney]' value='0' <?php if(!isset($data['localtown_superposition_pickingmoney']) || $data['localtown_superposition_pickingmoney'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="不叠加" name='parameter[localtown_superposition_pickingmoney]' value='1' <?php if( isset($data['localtown_superposition_pickingmoney']) && $data['localtown_superposition_pickingmoney'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+
+					</div>
+					<div class="layui-form-mid layui-word-aux">如果开启了同城配送，并且在同城配送范围内，选择叠加时购买多件商品的包装费等于每件商品包装费的总和， 选择不叠加，则使用其中商品包装费（包含统一运费）的最大值</div>
+				</div>
+
+
+				<!--<div class="layui-form-item" id="localtown_jiajia_delivery" <?php if(!isset($data['localtown_delivery_moneytype']) || $data['localtown_delivery_moneytype'] == 1){ ?> style="display:none;" <?php } ?>>-->
+				<div class="layui-form-item" style="display:none;">
+					<label class="layui-form-label">加价配送</label>
+					<div class='layui-input-block'>
+						<div class="input-group fixsingle-input-group">
+							<input class="form-control" name="parameter[localtown_makeup_delivery_money]" type="text" placeholder="" value="{$data['localtown_makeup_delivery_money']}">
+							<div class="input-group-addon">元</div>
+						</div>
+						<div class="layui-form-mid layui-word-aux">当订单的价格没有达到起送价加的时候加价也可以配送</div>
+					</div>
+				</div>
+				<!--
+				<div class="layui-form-item ">
+					<label class="layui-form-label">
+
+						订单免配送费谁出
+					</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="平台"  name='parameter[localtown_deliverymoney_burdentype]' value='0' <?php if(!isset($data['localtown_deliverymoney_burdentype']) || $data['localtown_deliverymoney_burdentype'] ==0){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="商家" name='parameter[localtown_deliverymoney_burdentype]' value='1' <?php if( isset($data['localtown_deliverymoney_burdentype']) && $data['localtown_deliverymoney_burdentype'] ==1 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+
+					</div>
+				</div>
+				-->
+				<div class="layui-form-item">
+					<label class="layui-form-label">店铺联系方式</label>
+					<div class='layui-input-block'>
+						<div class="radio-inline">
+							<div class="layui-input-inline">
+								<input type="text" name="parameter[localtown_shop_telephone]" value="{$data['localtown_shop_telephone']}" class="layui-input" />
+							</div>
+							<div class="layui-form-mid layui-word-aux">设置服务电话，骑手端在抢单成功的时候，可以联系商家进行沟通</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="layui-form-item">
+					<label class="layui-form-label must">店铺地址</label>
+					<div class="layui-input-block">
+						<p>
+							<select id="sel-provance" lay-ignore name="parameter[localtown_shop_province_id]" onChange="selectCity();"  style="width:130px;display:inline;">
+								<option value="" selected="true">省/直辖市</option>
+							</select>
+							<select id="sel-city" lay-ignore name="parameter[localtown_shop_city_id]" onChange="selectcounty(0)"  style="width:135px;display:inline;">
+								<option value="" selected="true">请选择</option>
+							</select>
+							<select id="sel-area" lay-ignore name="parameter[localtown_shop_area_id]" onChange="selectstreet(0)" style="width:130px;display:inline;">
+								<option value="" selected="true">请选择</option>
+							</select>
+							<select id="sel-street" lay-ignore name="parameter[localtown_shop_country_id]" style="width:130px;display:inline;">
+								<option value="" selected="true">请选择</option>
+							</select>
+						</p>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label must"> 店铺详细地址</label>
+					<div class="layui-input-block">
+						<div class="dEdit_1">
+							<div class="layui-inline">
+
+								<div class="layui-input-inline" style="width: 200px;">
+									<input type="text" style="width: 200px;" name="parameter[localtown_shop_address]" id="address"  data-val="true" data-val-required="请填写店铺所在详细地址" class="form-control" value="{$data['localtown_shop_address']}" data-rule-required="true"  />
+								</div>
+								<div class="layui-input-inline" style="width: 100px;">
+									<a class="btn btn-default" id="js_search_pos" onclick="getResult()">搜索地图</a>
+								</div>
+								<br />
+								<div class="layui-form-mid layui-word-aux">地图搜索以后，请点击地图定位进行标记坐标，经纬度出来以后在进行保存，以防设置失效。</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label must"> 经纬度</label>
+					<div class="layui-input-block">
+						<div class="dEdit_1">
+							<div class="layui-inline">
+
+								<div class="layui-input-inline" style="width: 100px;">
+									<input class="form-control input-sm" data-val="true"   id="lon" name="parameter[localtown_shop_lon]" readonly="readonly" type="text" value="{$data['localtown_shop_lon']}">
+								</div>
+
+								<div class="layui-input-inline" style="width: 100px;">
+									<input class="form-control input-sm" data-val="true" id="lat" name="parameter[localtown_shop_lat]" readonly="readonly" type="text" value="{$data['localtown_shop_lat']}">
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label must"> 地图定位</label>
+					<div class="layui-input-block">
+						<div class="map-box" id="container" style="width: 603px; height: 300px; float: left;"></div>
+						<div class="des" id="map_des" style="display: none; float: left;">请选择一个地址并点击地图中的“导入经纬度”</div>
+						<div class="info-box" id="infoDiv" style="display: none"></div>
+					</div>
+				</div>
+
+				<div class="layui-form-item <?php if($is_supply == 1){ ?>layui-hide<?php } ?>" >
+					<label class="layui-form-label">预计送达时间段</label>
+					<div class="layui-input-block">
+						<label class='radio-inline'>
+							<input type='radio' title="开启"  name='parameter[localtown_expected_delivery_status]' value='1' <?php if(isset($data['localtown_expected_delivery_status']) && $data['localtown_expected_delivery_status'] == 1){ ?> checked<?php }else{ ?> <?php } ?> />
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' title="关闭" name='parameter[localtown_expected_delivery_status]' value='0' <?php if( !isset($data['localtown_expected_delivery_status']) || $data['localtown_expected_delivery_status'] == 0 ){ ?> checked<?php }else{ ?> <?php } ?>  />
+						</label>
+					</div>
+					<div class="layui-form-mid layui-word-aux">开启后订单结算页面用户可以选择指定时间送达</div>
+
+				</div>
+				<div class="layui-form-item <?php if($is_supply == 1){ ?>layui-hide<?php } ?>"">
+					<label class="layui-form-label"></label>
+					<div class="layui-input-block">
+						<div class="input-group fixsingle-input-group">
+							<div class="input-group-addon">间隔</div>
+							<input class="form-control" name="parameter[localtown_delivery_space_time]" type="text" placeholder="" value="{$data['localtown_delivery_space_time']}">
+							<div class="input-group-addon">分钟</div>
+						</div>
+						<span class='layui-form-mid layui-word-aux'>配送时间段间隔不小于15分钟，设置成功后，用户下单可以选择设定好的时间段进行收货</span>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label"> </label>
+					<div class="layui-input-block">
+						<input type="hidden" value="{$data['delivery_diy_sort']}" name="parameter[delivery_diy_sort]" id="sortIpt" />
+						<input type="submit" value="提交" lay-submit lay-filter="formDemo" class="btn btn-primary"  />
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script src="/layuiadmin/layui/layui.js"></script>
+<script src="/static/js/jquery-sortable.js"></script>
+<script>
+	layui.config({
+		base: '/layuiadmin/' //静态资源所在路径
+	}).extend({
+		index: 'lib/index' //主入口模块
+	}).use('index');
+</script>
+<script>
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+var layer = layui.layer;
+var $;
+
+var cur_open_div;
+
+layui.use(['jquery', 'layer','form'], function(){ 
+  $ = layui.$;
+  var form = layui.form;
+  
+	form.on('radio(formlocaltowndeliverymoneytype)', function(data){
+		if (data.value == 1) {
+			$('#fixed_deliverymoney_set').hide();
+			$('#basedistance_deliverymoney_set').show();
+			//$('#localtown_jiajia_delivery').hide();
+		} else {
+			$('#basedistance_deliverymoney_set').hide();
+            $('#fixed_deliverymoney_set').show();
+			//$('#localtown_jiajia_delivery').show();
+		}
+	});
+
+
+	form.on('radio(formexpress)', function(data){
+		if (data.value == 1) {
+			$('#man_free_shipping').show();
+		} else {
+			$('#man_free_shipping').hide();
+		}
+	});  
+	form.on('radio(formordernote)', function(data){
+		if (data.value == 1) {
+			$('#ordernotename').show();
+		} else {
+			$('#ordernotename').hide();
+		}
+	});  
+
+	$('#close_tuanz').click(function(){
+		$('#txtPickupDateTip').hide();
+		$('#free_tuanz_free').hide();
+	})
+	$('#open_tuanz').click(function(){
+		$('#txtPickupDateTip').css('display','inline-block');
+		$('#free_tuanz_free').css('display','inline-block');
+	})
+		
+	$('#chose_link').click(function(){
+		cur_open_div = $(this).attr('data-input');
+		$.post("{php echo shopUrl('util.selecturl', array('ok' => 1))}", {}, function(shtml){
+		 layer.open({
+			type: 1,
+			area: '930px',
+			content: shtml //注意，如果str是object，那么需要字符拼接。
+		  });
+		});
+	})
+		
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+	
+	 $.ajax({
+		url: data.form.action,
+		type: data.form.method,
+		data: data.field,
+		dataType:'json',
+		success: function (info) {
+		  
+			if(info.status == 0)
+			{
+				layer.msg(info.result.message,{icon: 1,time: 2000});
+			}else if(info.status == 1){
+				var go_url = location.href;
+				if( info.result.hasOwnProperty("url") )
+				{
+					go_url = info.result.url;
+				}
+				
+				layer.msg('操作成功',{time: 1000,
+					end:function(){
+						location.href = info.result.url;
+					}
+				}); 
+			}
+		}
+	});
+	
+	return false;
+  });
+})
+
+$(function  () {
+	var group = $("#sortable").sortable({
+		group: 'limited_drop_targets',
+		handle: 'i.fa-arrows-alt',
+		onDrop: function ($item, container, _super) {
+			console.log(group.sortable("serialize").get().join("\n"));
+			$('#sortIpt').val(group.sortable("serialize").get().join("\n"));
+			_super($item, container);
+		},
+		serialize: function (parent, children, isContainer) {
+			return isContainer ? children.join() : $(parent).data('id');
+		},
+		tolerance: 6,
+		distance: 10
+	})
+
+})
+
+</script>
+
+
+<script>
+    var map, searchService, marker, markers = [], infoWin = null;
+    var initMap = function () {
+    <?php if( !empty($data['localtown_shop_lat']) ){ ?>
+            var center = new qq.maps.LatLng({$data['localtown_shop_lat']},{$data['localtown_shop_lon']});
+        <?php }else{?>
+            var center = new qq.maps.LatLng(39.916527, 116.397128);
+        <?php }?>
+        map = new qq.maps.Map(document.getElementById('container'), {
+            center: center,
+            zoom: 13
+        });
+        var scaleControl = new qq.maps.ScaleControl({
+            align: qq.maps.ALIGN.BOTTOM_LEFT,
+            margin: qq.maps.Size(85, 15),
+            map: map
+        });
+        //调用Poi检索类
+        searchService = new qq.maps.SearchService({
+            //检索成功的回调函数
+            complete: function (results) {
+                //设置回调函数参数
+                var pois = results.detail.pois;
+                infoWin = new qq.maps.InfoWindow({
+                    map: map
+                });
+                var latlngBounds = new qq.maps.LatLngBounds();
+                for (var i = 0, l = pois.length; i < l; i++) {
+                    var poi = pois[i];
+                    //扩展边界范围，用来包含搜索到的Poi点
+                    latlngBounds.extend(poi.latLng);
+                    (function (n) {
+                        var marker = new qq.maps.Marker({
+                            map: map
+                        });
+                        marker.setPosition(pois[n].latLng);
+                        markers.push(marker);
+                        qq.maps.event.addListener(marker, 'click', function () {
+                            infoWin.open();
+                            infoWin.setContent('<div style = "width:200px;padding:10px 0;">' + pois[n].address + '<div class="map-import-btn"><input type="button" class="btn btn-xs btn-primary" value="导入经纬度" onclick="chooseShopLoc(this);" address=' + pois[n].address + ' lat =' + pois[n].latLng.getLat() + '  lng =' + pois[n].latLng.getLng() + ' /></div></div>');
+                            infoWin.setPosition(pois[n].latLng);
+                        });
+                    })(i);
+                }
+                //调整地图视野
+                map.fitBounds(latlngBounds);
+            },
+            //若服务请求失败，则运行以下函数
+            error: function () {
+                alert("很抱歉，未搜索到此地址，请重新输入！");
+            }
+        });
+    }
+    function getSelectArea() {
+        var storeArr = [];
+        var s_province = $('#sel-provance').val();
+        var s_city = $('#sel-city').val();
+        var s_area = $('#sel-area').val();
+        var s_street = $('#sel-street').val();
+
+        if('请选择省份' != s_province)
+        {
+            storeArr.push(s_province);
+        }
+        if('请选择城市' != s_city)
+        {
+            storeArr.push(s_city);
+        }
+        if('请选择区域' != s_area)
+        {
+            storeArr.push(s_area);
+        }
+        if('请选择街道/镇' != s_street && '' != s_street)
+        {
+            storeArr.push(s_street);
+        }
+
+
+        $("#area-selector select").each(function (i) {
+            if ($(this).find("option:selected").text() != '请选择') {
+                storeArr.push($(this).find("option:selected").text());
+            }
+        });
+        return storeArr;
+    }
+    //查询社区信息
+    function chooseShopLoc(t) {
+        var address = $(t).attr("address");
+        var storeAreaArr = getSelectArea();
+
+        for (var i = 3; i >= 0; i--) {
+            if (i == 0)
+            {
+                address = address.replace(storeAreaArr[0] + "市", '');
+            }
+            address = address.replace(storeAreaArr[i], '');
+        }
+        var lat = $(t).attr("lat");
+        var lng = $(t).attr("lng");
+        this.clearMarkers();
+        var position = new qq.maps.LatLng(lat, lng);
+        marker = new qq.maps.Marker({
+            map: map,
+            position: position,
+            draggable: true
+        });
+        map.panTo(position);
+        map.zoomTo(18);
+        $("#lon").val(lng);
+        $("#lat").val(lat);
+        qq.maps.event.addListener(marker, 'dragend', function () {
+            if (marker.getPosition()) {
+                $("#lon").val(marker.getPosition().getLng());
+                $("#lat").val(marker.getPosition().getLat());
+            }
+        });
+        if (infoWin) {
+            infoWin.close();
+        }
+        $("#map_des").hide();
+    }
+    ////删除所有标记
+    function clearMarkers() {
+        if (markers) {
+            for (i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+            markers.length = 0;
+        }
+    }
+
+    //搜索地址，这里需要判断是否选择了省市区
+    function getResult() {
+        if ($("#AddressId").val() <= 0) {
+            // $.dialog.tips("请先选择店铺地址");
+            return;
+        }
+        if ($.trim($("#address").val()).length == 0) {
+            //tip.msgbox.err('请先输入详细地址');
+            layer.msg('请先输入详细地址',{icon: 1,time: 2000});
+            return;
+        }
+        if (marker != null) marker.setMap(null);
+        clearMarkers();
+        if (infoWin) {
+            infoWin.close();
+        }
+        var storeArr = getSelectArea();
+        var regions = storeArr[0] + storeArr[1] + storeArr[2];
+        var regionText = storeArr.join(',');
+        var poiText = regions + $.trim($("#address").val());
+        searchService.setLocation(regionText);
+        searchService.search(poiText);
+        $("#map_des").show();
+    }
+
+</script>
+<script language='javascript'>
+    $(function(){
+        cascdeInit("1","1","{$data['province_name']}","{$data['city_name']}","{$data['area_name']}","{$data['country_name']}");
+        initMap();//初始化门店地图
+    });
+    require(['bootstrap'],function(){
+        $('#myTab a').click(function (e) {
+            e.preventDefault();
+            $('#tab').val( $(this).attr('href'));
+            $(this).tab('show');
+        })
+    });
+
+    function showbacktype(type){
+
+        $('.backtype').hide();
+        $('.backtype' + type).show();
+    }
+    $(function(){
+
+
+
+    })
+</script>
+</body>

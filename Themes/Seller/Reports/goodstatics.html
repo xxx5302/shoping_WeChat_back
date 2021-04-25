@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+  <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+  <!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  <link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+  <link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+  <script type="text/javascript">
+      window.sysinfo = {
+        <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+        <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+        <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+        <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+        'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+        'siteroot': '{$_W['siteroot']}',
+        'siteurl': '{$_W['siteurl']}',
+        'attachurl': '{$_W['attachurl']}',
+        'attachurl_local': '{$_W['attachurl_local']}',
+        'attachurl_remote': '{$_W['attachurl_remote']}',
+        'module': {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+        'cookie': {'pre': ''},
+        'account': {:json_encode($_W['account'])},
+      };
+  </script>
+		
+  <script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+  <script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+  <script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+  <script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+  <script type="text/javascript" src="./resource/js/lib/jquery.nice-select.js?v=201903260001"></script>
+  <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+  <link href="/static/css/snailfish.css" rel="stylesheet">
+  <style type="text/css">
+      .layui-btn-sm { line-height: 34px;height: 34px; }
+      .layui-btn-group .layui-btn:first-child {border-radius: 0;}
+      .text-green { color: #15d2b9 !important; }
+	  .daterangepicker select.ampmselect, .daterangepicker select.hourselect, .daterangepicker select.minuteselect {
+			width: auto!important;
+	  }
+      .tipDiv{display:inline;border-radius: 50%; height: 18px;width:18px; display: inline-block; border-style: solid; border-color: #8a8a8a; border-width:1px;font-size:11px}
+      .tipSpan{padding-left: 5px;font-weight:bold;color:#8a8a8a;}
+      .showDiv{position: absolute; right: 5px;background-color: #8a8a8a; height:35px;width:320px;display:none;border-radius:20px;text-align:center;color:#fff;}
+  </style>
+</head>
+<body layadmin-themealias="default">
+
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text">毛利统计</span></div>
+        <div class="layui-card-body" style="padding:15px;">
+        <div class="page-content">
+            <form action="" method="get" class="form-horizontal form-search layui-form" role="form" id="search">
+        		<input type="hidden" name="c" value="reports" />
+                <input type="hidden" name="a" value="goodstatics" />
+			   
+                <div class="page-toolbar">
+                    <div class="layui-form-item">
+                        <span class="layui-input-inline">
+    						<select name='searchtime' class='form-control' style="width:100px;padding:0 5px;"  id="searchtime">
+                                <option value=''>不按时间</option>
+                                <option value='create_time' <?php if($gpc['searchtime']=='create_time'){ ?>selected<?php } ?>>下单时间</option>
+                            </select>
+    					</span>
+    					<span class="layui-input-inline" style="width: 285px;">
+    						{:tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d H:i', $starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+    					</span>
+                        <div class="layui-input-inline">
+                            <input type="hidden" name="export" id="export" value="0">
+                        </div>
+                        <div class="layui-input-inline" style="width: 400px;margin-right: 0px;">
+				            <input type="text" class="layui-input" name='keyword' id="keyword" value="{$gpc['keyword']}" placeholder="请输入商品名称">
+                        </div>
+                        <div class="layui-btn-group">
+                            <button class="layui-btn btn-submit layui-btn-sm" data-export="0" type="submit"> 搜索</button>
+    						<button data-export="1" type="submit" class="layui-btn layui-btn-sm btn-submit layui-btn-primary">导出</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+	        <div class="row" style="margin: 10px 0;">
+                <div class="col-md-3">商品总销售量：{$all_quantity}</div>
+                <div class="col-md-3">总销售额（商城售价）：<?php echo round($all_total,2); ?>（元）</div>
+            </div>
+            <form action="" method="post" class="layui-form" role="form">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="layui-table" lay-skin="line" lay-size="lg">
+                            <thead>
+                                <tr>
+            						<th style="width:50px;text-align:center;">排名</th>
+            						<th style="width: 10%;">
+                                        商品名称
+                                        <span class="tipDiv" onmouseover="overShow1()" onmouseout="outHide1()"><span class="tipSpan">？</span></span>
+                                        <div id="showDiv1" class="showDiv" style="left: 5px;right:0px;padding-top: 5px;"></div>
+                                    </th>
+            						<th style="width: 100px;">规格</th>
+            						<th style="width: 100px;">商城售价(元)</th>
+            						<th style="width: 100px;">成本价(元)</th>
+            						<th style="width: 100px;">
+                                        商品销量
+                                        <span class="tipDiv" onmouseover="overShow2()" onmouseout="outHide2()"><span class="tipSpan">？</span></span>
+                                        <div id="showDiv2" class="showDiv" style="left: 5px;right:0px;padding-top: 5px;width: 150px;"></div>
+                                    </th>
+            						<th style="width: 100px;">
+                                        商品销量总价(元)
+                                        <span class="tipDiv" onmouseover="overShow3()" onmouseout="outHide3()"><span class="tipSpan">？</span></span>
+                                        <div id="showDiv3" class="showDiv" style="left: 5px;right:0px;padding-top: 5px;width: 300px;"></div>
+                                    </th>
+            						<th style="width: 100px;">
+                                        商品销量成本总价(元)
+                                        <span class="tipDiv" onmouseover="overShow4()" onmouseout="outHide4()"><span class="tipSpan">？</span></span>
+                                        <div id="showDiv4" class="showDiv" style="left: 5px;right:0px;padding-top: 5px;width: 300px;"></div>
+                                    </th>
+            						<th style="width: 100px;">
+                                        毛利额
+                                        <span class="tipDiv" onmouseover="overShow5()" onmouseout="outHide5()"><span class="tipSpan">？</span></span>
+                                        <div id="showDiv5" class="showDiv" style="left: 5px;right:0px;padding-top: 5px;width: 300px;"></div>
+                                    </th>
+            						<th style="width: 100px;">
+                                        毛利率(%)
+                                        <span class="tipDiv" onmouseover="overShow6()" onmouseout="outHide6()"><span class="tipSpan">？</span></span>
+                                        <div id="showDiv6" class="showDiv" style="right:10px;padding-top: 5px;width: 300px;"></div>
+                                    </th>
+            					</tr>
+                            </thead>
+                            <tbody>
+                                <?php if(!empty($list)){ ?>
+								<?php foreach($list as $item){ ?>
+                                <tr>
+                					<td style="width:100px;text-align:center;">
+                						{$item['rank']}
+                					</td>
+                					<td>
+                						{$item['name']}
+                					</td>
+                					<td>
+										{$item['option_sku']}
+                					</td>
+                					<td>
+                						<?php echo round($item['price'],2); ?>
+                					</td>
+                					<td>
+                                        <?php echo round($item['cost_price'],2); ?>
+                					</td>
+                					<td>
+                						{$item['quantity']}
+                					</td>
+                					<td>
+                                        <?php echo round($item['total_price'],2); ?>
+                					</td>
+                					<td>
+                                        <?php echo round($item['cost_total_price'],2); ?>
+                					</td>
+                					<td >
+                                        <?php echo round($item['profit_total'],2); ?>
+                					</td>
+                					<td >
+                						{$item['profit_fee']}%
+                					</td>
+                                </tr>
+                                <?php } ?>
+                                <?php }else{ ?>
+                                <tr>
+                                    <td colspan="10" style="text-align: center;">暂无数据！</td>
+                                </tr>
+                                <?php } ?>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="10" style="text-align: right">
+                                        {$pager}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+					
+                    </div>
+					
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/layuiadmin/layui/layui.js"></script>
+
+<script>
+	layui.config({
+		base: '/layuiadmin/' //静态资源所在路径
+	}).extend({
+		index: 'lib/index' //主入口模块
+	}).use('index');
+</script>
+<script>
+var layer = layui.layer;
+var $;
+
+layui.use(['jquery', 'layer','form'], function(){ 
+    $ = layui.$;
+    var form = layui.form;
+  
+
+})
+function overShow1() {
+    var showDiv = document.getElementById('showDiv1');
+    showDiv.style.display = 'block';
+    showDiv.innerHTML = '<div class="table"><div class="table-tr"><div class="table-td">只统计已完成的订单商品数量。</div></div></div>';
+}
+function outHide1() {
+    var showDiv = document.getElementById('showDiv1');
+    showDiv.style.display = 'none';
+    showDiv.innerHTML = '';
+}
+
+function overShow2() {
+    var showDiv = document.getElementById('showDiv2');
+    showDiv.style.display = 'block';
+    showDiv.innerHTML = '<div class="table"><div class="table-tr"><div class="table-td">不包含虚拟销量。</div></div></div>';
+}
+function outHide2() {
+    var showDiv = document.getElementById('showDiv2');
+    showDiv.style.display = 'none';
+    showDiv.innerHTML = '';
+}
+
+function overShow3() {
+    var showDiv = document.getElementById('showDiv3');
+    showDiv.style.display = 'block';
+    showDiv.innerHTML = '<div class="table"><div class="table-tr"><div class="table-td">商品销量总价 = 商城售价 * 商品销量</div></div></div>';
+}
+function outHide3() {
+    var showDiv = document.getElementById('showDiv3');
+    showDiv.style.display = 'none';
+    showDiv.innerHTML = '';
+}
+
+function overShow4() {
+    var showDiv = document.getElementById('showDiv4');
+    showDiv.style.display = 'block';
+    showDiv.innerHTML = '<div class="table"><div class="table-tr"><div class="table-td">商品销量成本总价 = 成本价 * 商品销量</div></div></div>';
+}
+function outHide4() {
+    var showDiv = document.getElementById('showDiv4');
+    showDiv.style.display = 'none';
+    showDiv.innerHTML = '';
+}
+
+function overShow5() {
+    var showDiv = document.getElementById('showDiv5');
+    showDiv.style.display = 'block';
+    showDiv.innerHTML = '<div class="table"><div class="table-tr"><div class="table-td">毛利额 = 商品销量总价 - 商品销量成本总价</div></div></div>';
+}
+function outHide5() {
+    var showDiv = document.getElementById('showDiv5');
+    showDiv.style.display = 'none';
+    showDiv.innerHTML = '';
+}
+
+function overShow6() {
+    var showDiv = document.getElementById('showDiv6');
+    showDiv.style.display = 'block';
+    showDiv.innerHTML = '<div class="table"><div class="table-tr"><div class="table-td">毛利率 = 毛利额 / 商品销量总价</div></div></div>';
+}
+function outHide6() {
+    var showDiv = document.getElementById('showDiv6');
+    showDiv.style.display = 'none';
+    showDiv.innerHTML = '';
+}
+
+</script>  
+
+<script>
+	$(function () {
+        $('.btn-submit').click(function () {
+            var e = $(this).data('export');
+            if(e>0 ){
+                if($('#keyword').val() !='' ){
+                    $('#export').val(e);
+                    $('#search').submit();
+                }else if($('#searchtime').val()!=''){
+                    $('#export').val(e);
+                    $('#search').submit();
+                }else{
+                    $('#export').val(e);
+                    $('#search').submit();
+                }
+            }else{
+                $('#export').val(0);
+                $('#search').submit();
+            }
+        })
+    })
+</script>
+</body>
+</html>

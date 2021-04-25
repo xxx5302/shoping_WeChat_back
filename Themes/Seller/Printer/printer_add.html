@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <?php $shoname_name = D('Home/Front')->get_config_by_name('shoname'); ?>
+  <title><?php echo $shoname; ?></title>
+  <link rel="shortcut icon" href="" />
+        
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <link rel="stylesheet" href="/layuiadmin/style/admin.css" media="all">
+ 
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->  
+
+<link href="./resource/css/bootstrap.min.css?v=201903260001" rel="stylesheet">
+<link href="./resource/css/common.css?v=201903260001" rel="stylesheet">
+<script type="text/javascript">
+            window.sysinfo = {
+            <?php if (!empty($_W['uniacid']) ){ ?>'uniacid': '{$_W['uniacid']}',<?php } ?>
+			
+            <?php if( !empty($_W['acid'])  ){ ?>'acid': '{$_W['acid']}',<?php } ?>
+			
+            <?php if (!empty($_W['openid']) ) { ?>'openid': '{$_W['openid']}',<?php } ?>
+			
+            <?php if( !empty($_W['uid']) ) {  ?>'uid': '{$_W['uid']}',<?php } ?>
+			
+            'isfounder': <?php if (!empty($_W['isfounder']) ) { ?>1<?php  }else{  ?>0<?php } ?>,
+			
+            'siteroot': '{$_W['siteroot']}',
+                    'siteurl': '{$_W['siteurl']}',
+                    'attachurl': '{$_W['attachurl']}',
+                    'attachurl_local': '{$_W['attachurl_local']}',
+                    'attachurl_remote': '{$_W['attachurl_remote']}',
+                    'module' : {'url' : '<?php if( defined('MODULE_URL') ) { ?>{MODULE_URL}<?php } ?>', 'name' : '<?php if (defined('IN_MODULE') ) { ?>{IN_MODULE}<?php } ?>'},
+            'cookie' : {'pre': ''},
+            'account' : {:json_encode($_W['account'])},
+            };
+        </script>
+		
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="./resource/js/app/util.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/app/common.min.js?v=201903260001"></script>
+<script type="text/javascript" src="./resource/js/require.js?v=201903260001"></script>
+<link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+<link href="/static/css/snailfish.css" rel="stylesheet">
+<style>
+    .content{
+        display:none;
+        width:200px;
+        height:200px;
+        border-radius:10px;
+        padding:20px;
+        position:relative;
+        top:15px;
+        left:50%;
+        background-color:FFFFFF;
+        border:1px solid;
+    }
+</style>
+</head>
+<body layadmin-themealias="default">
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-header layui-elem-quote">当前位置：<span class="line-text"><?php if(!empty($data['id'])){ ?>编辑<?php }else{ ?>添加<?php } ?>打印机</span></div>
+		<div class="layui-card-body" style="padding:15px;">
+			<form action="" method="post" class="layui-form" lay-filter="component-layui-form-item">
+				
+				<input type="hidden" name="data[id]" value="{$item[id]}" />
+	
+				<div class="layui-form-item">
+                    <label class="layui-form-label mustl">打印机名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="data[printer_name]" class="form-control" value="{$item[printer_name]}"  lay-verify='true' style="width: 50%;display: inline-block;" maxlength="100"/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#" style="color: #00a9d0;display:inline;" class="contact">飞鹅官方购买</a>
+                        <div class="content" style="color: black;display:none;">
+                            <div align="center"><img src="/static/images/feie.png" alt="飞鹅打印机"  height="135"></div>
+                            <span style="text-align: center;display:block;">扫码购买</span>
+                        </div>
+                        <span class='help-block'>打印机名称，例如：商店打印机器</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">打印机类型</label>
+                    <div class="layui-input-block"  style="width: 50%;">
+                        <select id="printer_type"  name='data[printer_type]'  class="form-control select2" lay-filter="printer_type">
+                            <option value="1" <?php if($item['printer_type'] == 1){ ?>selected="selected"<?php } ?>>飞鹅打印机</option>
+                            <option value="2" <?php if($item['printer_type'] == 2){ ?>selected="selected"<?php } ?>>易联云打印机</option>
+                        </select>
+                        <span class='help-block'>选中打印机类型，目前已支持打印机：飞鹅打印机，易联云K4、K5、K6打印机</span>
+                    </div>
+                </div>
+
+                <div class="feie_printer" <?php if(empty($item['printer_type']) || $item['printer_type'] == 1){?>style="display:block;"<?php }else{ ?>style="display:none;"<?php } ?>>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label mustl">sn</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[printer_sn]" class="form-control" value="{$item[printer_sn]}"  lay-verify='true' style="width: 50%;" maxlength="100"/>
+                            <span class='help-block'>支持飞鹅打印机（sn，key在机子底部）</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label mustl">key</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[printer_key]" class="form-control" value="{$item[printer_key]}"  lay-verify='true' style="width: 50%;" maxlength="100"/>
+                            <span class='help-block'>支持飞鹅打印机（sn，key在机子底部）</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="yly_printer"  <?php if($item['printer_type'] == 2){ ?> style="display:block;" <?php }else{ ?> style="display:none;" <?php } ?>>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label mustl">应用id</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[api_id]" class="form-control" value="{$item[api_id]}"  lay-verify='true' style="width: 50%;" maxlength="100"/>
+                            <span class='help-block'>应用id（管理中心系统集成里获取）</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label mustl">应用密钥key</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[api_key]" class="form-control" value="{$item[api_key]}"  lay-verify='true' style="width: 50%;" maxlength="100"/>
+                            <span class='help-block'>apiKey（管理中心系统集成里获取）</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label mustl">打印机终端号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[printer_yly_sn]" class="form-control" value="{$item[printer_sn]}"  lay-verify='true' style="width: 50%;" maxlength="100"/>
+                            <span class='help-block'>打印机终端号，终端密钥在机子底部，开发者中心应用类型选择：自由型应用</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label mustl">终端密钥</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="data[printer_yly_key]" class="form-control" value="{$item[printer_key]}"  lay-verify='true' style="width: 50%;" maxlength="100"/>
+                            <span class='help-block'>打印机终端号，终端密钥在机子底部，开发者中心应用类型选择：自由型应用</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label mustl">打印联数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="data[printer_num]" class="form-control" value="{$item[printer_num]}"  lay-verify='true' style="width: 50%;" maxlength="10"/>
+                        <span class='help-block'>同一订单，打印的次数</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label mustl">状态</label>
+                    <div class="layui-input-block" id="param-items">
+                        <label class="radio-inline">
+                            <input type="radio" name='data[status]' value="1" <?php if( !empty($item['status']) || $item['status']==1){ ?>checked<?php } ?> title="启用" />
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name='data[status]' value="0" <?php if( empty($item['status']) && $item['status'] == 0){ ?>checked<?php } ?> title="禁用" />
+                        </label>
+                    </div>
+                </div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label"> </label>
+					<div class="layui-input-block">
+						<input type="submit" value="提交" lay-submit lay-filter="formDemo" class="btn btn-primary"  />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="btn btn-default" style='margin-left:10px;' href="{:U('printer/index',array('ok'=>'1'))}">返回列表</a>
+						
+					</div>
+				</div>
+			</form>
+		</div>
+</div>
+</div>
+
+<script src="/layuiadmin/layui/layui.js"></script>
+
+<script>
+	layui.config({
+		base: '/layuiadmin/' //静态资源所在路径
+	}).extend({
+		index: 'lib/index' //主入口模块
+	}).use('index');
+</script>
+<script>
+$(document).ready(function(){
+    $(".contact").mouseover(function(){
+        $(".content").show("slow");
+        $(".contact").mouseout(function(){
+            $(".content").hide("slow");
+        });
+    });
+
+})
+
+//由于模块都一次性加载，因此不用执行 layui.use() 来加载对应模块，直接使用即可：
+var layer = layui.layer;
+var $;
+
+var cur_open_div;
+
+layui.use(['jquery', 'layer','form'], function(){ 
+    $ = layui.$;
+    var form = layui.form;
+
+    form.on('select(printer_type)', function(data){
+        var type = data.value;
+        if(type == 1){
+            $('.feie_printer').show();
+            $('.yly_printer').hide();
+        }else if(type == 2){
+            $('.feie_printer').hide();
+            $('.yly_printer').show();
+        }
+    });
+		
+    //监听提交
+    form.on('submit(formDemo)', function(data){
+    var loadingIndex = layer.load();
+     $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        data: data.field,
+        dataType:'json',
+        success: function (info) {
+
+            if(info.status == 0)
+            {
+                layer.msg(info.result.message,{icon: 1,time: 2000});
+                layer.close(loadingIndex);
+            }else if(info.status == 1){
+                var go_url = location.href;
+                if( info.result.hasOwnProperty("url") )
+                {
+                    go_url = info.result.url;
+                }
+
+                layer.msg('操作成功',{time: 1000,
+                    end:function(){
+                        location.href = info.result.url;
+                    }
+                });
+            }
+        }
+    });
+
+    return false;
+    });
+})
+
+
+
+</script>  
+</body>

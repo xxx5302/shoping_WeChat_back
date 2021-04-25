@@ -1,0 +1,70 @@
+<?php foreach($need_data as $val){ ?>
+		<div class="w794">
+			<table width ="794px" cellpadding="0">
+				<tr class="lft">
+					<td class="tdleft bold"><?php echo $shoname; ?></td>
+					<td class="tdleft bold">（团长配送清单）</td>
+				</tr>
+				<tr class="lft">
+					<td class=" ">团长名称：<?php echo $val['head_info']['head_name']; ?></td>
+					<td class=" ">团长电话：<?php echo $val['head_info']['head_mobile']; ?></td>
+				</tr>
+				<tr class="lft">
+					<td class=" ">配送地址：<?php echo $val['head_info']['head_address']; ?></td>
+					<td class=" "></td>
+				</tr>
+				<tr class="lft">
+					<td class=" ">配送单号：<?php echo $val['head_info']['list_sn']; ?></td>
+					<td class=" ">配送时间：</td>
+				</tr>
+				<tr class="lft">
+					<td class=" ">司机名称：<?php echo $val['head_info']['clerk_name']; ?></td>
+					<td class=" ">司机电话：<?php echo $val['head_info']['clerk_mobile']; ?></td>
+				</tr>
+				<tr class="lft">
+					<td class=" ">配送线路：<?php echo $val['head_info']['line_name']; ?></td>
+					
+				</tr>
+			</table>
+		</div>
+		<div class="w794">
+			<table width ="792px"  border="1"  cellpadding="0">
+			  <tr class="a">
+				<td class="td1">序号</td>
+				<td class="td3" style='width:80px'>微信昵称</td>
+				<td class="td3" style='width:80px'>联系人</td>
+				<td class="td4" style='width:130px'>联系电话</td>
+				<td class="td2" style='width:280px'>商品与规格</td>
+				<td class="td1" >数量</td>
+				<td class="td3" style='width:80px'>金额</td>
+				<td class="td1">签收</td>
+			  </tr>
+			  <?php $i=1; foreach($val['need_order_list'] as $order_info ){ ?>
+				<tr class="a">
+					<td class="num"  ><?php echo $i; ?></td>
+					<td  ><?php echo $order_info['username']; ?></td>
+					<td  ><?php echo $order_info['shipping_name']; ?></td>
+					<td  ><?php echo $order_info['shipping_tel']; ?></td>
+					<td style="border:none;<?php if($i >1){ ?> border-top:1px solid #000;  border-left:1px solid #000; <?php } ?>">
+					<?php foreach($order_info['order_goods'] as $key => $order_goods){ ?>
+						<?php if($key >0){ ?><hr style="height:1px;border:none;border-top:1px dashed;" /> <?php }else{ ?> <div style="height:4px;" ></div >	<?php } ?>
+						 <div style="height:0 auto;margin: 0 auto;"><?php echo $order_goods['name'].$order_goods['sku_name']; ?> &ensp;</div > 		
+					<?php } ?>
+					</td>
+					<td  >
+					<?php foreach($order_info['order_goods'] as $key =>$order_goods){ ?>
+						<?php if($key >0){ ?><hr style="height:1px;border:none;border-top:1px dashed;" /><?php }else{ ?> <div style="height:4px;" ></div >	<?php } ?>
+						<div style="height:0 auto;margin: 0 auto;"><?php echo $order_goods['quantity']; ?></div >	
+					<?php } ?>
+					</td>
+					
+					<td  ><?php echo $order_info['order_all_total']; ?></td>
+					<td></td>
+				</tr>
+				<?php $i++; } ?>
+			  <?php  ?>
+			  
+			</table>
+		</div>
+		<div class="PageNext"></div>	
+		<?php } ?>
